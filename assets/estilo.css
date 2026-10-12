@@ -335,3 +335,23 @@ form { text-align: left; }
 .contador-rec b { display: block; font-size: 38px; font-weight: 400; line-height: 1; }
 .manual { display: grid; grid-template-columns: 1fr auto; gap: 10px; align-items: end; margin: 6px 16px 60px; }
 .manual .botao { width: auto; min-height: 46px; }
+
+/* ---------- Mural de recados ---------- */
+.recados .script { font-size: 64px; margin: 0; }
+.mural { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; margin: 22px -30px 8px; scrollbar-width: none; }
+.mural::-webkit-scrollbar { display: none; }
+.recado { flex: 0 0 100%; scroll-snap-align: center; margin: 0; padding: 0 30px; }
+.recado blockquote {
+  position: relative; margin: 0; min-height: 150px; padding: 30px 22px 22px;
+  display: flex; align-items: center; justify-content: center;
+  background: var(--papel); border: 1px solid var(--bege-2); border-radius: 20px;
+  font-style: italic; font-size: 20px; line-height: 1.5; box-shadow: 0 14px 30px rgba(59, 36, 22, .07);
+  overflow-wrap: anywhere;
+}
+.recado blockquote::before { content: '“'; position: absolute; top: 4px; left: 16px; font-size: 56px; line-height: 1; font-style: normal; color: var(--bege-2); }
+.recado figcaption { margin-top: 12px; font-family: var(--sans); font-size: 11px; letter-spacing: .24em; text-transform: uppercase; color: var(--tinta-2); }
+.mural-vazio { flex: 1; margin: 0; padding: 18px 30px; font-style: italic; color: var(--tinta-2); }
+.mural-pontos { display: flex; justify-content: center; gap: 7px; min-height: 6px; margin: 6px 0 24px; }
+.mural-pontos span { width: 6px; height: 6px; border-radius: 50%; background: var(--linha); transition: background .3s, transform .3s; }
+.mural-pontos span.ativo { background: var(--tinta); transform: scale(1.35); }
+.contagem { float: right; font-style: normal; letter-spacing: .05em; }

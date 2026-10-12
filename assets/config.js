@@ -28,14 +28,15 @@ window.CONVITE = {
   historia: [
     { data: "2017", titulo: "O começo", texto: "Nos conhecemos nos corredores da faculdade de engenharia. Entre cálculos, projetos e madrugadas de estudo, nasceu uma amizade." },
     { data: "13·09·2019", titulo: "O primeiro sim", texto: "A amizade virou amor e começamos a namorar. Desde então, somos parceiros em cada projeto da vida." },
+    { data: "25·12·2022", titulo: "O noivado", texto: "No Natal de 2022, com o coração cheio de gratidão, dissemos “sim” ao compromisso de caminhar juntos para sempre." },
     { data: "17·12·2026", titulo: "Para sempre", texto: "Engenheiros e cúmplices de vida, agora vamos construir juntos a obra mais importante: a nossa família." }
   ],
 
   // Versículos e mensagem
   versiculo1: "O amor é paciente, o amor é bondoso. Tudo sofre, tudo crê, tudo espera, tudo suporta. O amor nunca perece.",
   versiculo1Ref: "1 Coríntios 13:4,7-8",
-  versiculo2: "Por essa razão, o homem deixará pai e mãe e se unirá à sua mulher, e os dois se tornarão uma só carne.",
-  versiculo2Ref: "Efésios 5:31",
+  versiculo2: "Para que todos vejam, e saibam, e considerem, e juntamente entendam que a mão do Senhor fez isso.",
+  versiculo2Ref: "Isaías 41:20",
   deusAma: "Foi Ele quem criou a união entre o homem e a mulher e a abençoou desde o princípio. Por isso, mais do que uma festa, este dia é um culto de gratidão a Ele por tudo o que construímos até aqui.",
 
   // Avisos

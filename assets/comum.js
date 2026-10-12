@@ -253,6 +253,16 @@
       salvarDemo(db);
       return { ok: true, status: 'ok', nome: p.nome, convite, horario: p.checkin };
     },
+    mensagens() {
+      return { ok: true, mensagens: (lerDemo().mensagens || []).slice().reverse() };
+    },
+    mensagem(d) {
+      const db = lerDemo();
+      db.mensagens = db.mensagens || [];
+      db.mensagens.push({ nome: String(d.nome).slice(0, 60), mensagem: String(d.mensagem).slice(0, 280), data: new Date().toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' }) });
+      salvarDemo(db);
+      return { ok: true };
+    },
     estatisticas(d) {
       if (d.senha !== SENHA_DEMO) return { ok: false, erro: 'Senha incorreta.' };
       const g = lerDemo().pessoas;
@@ -261,7 +271,7 @@
   };
 
   /* ---------- Comunicação com a planilha (Google Apps Script) ---------- */
-  const LEITURAS = ['convite', 'convidado', 'presentes'];
+  const LEITURAS = ['convite', 'convidado', 'presentes', 'mensagens'];
   async function api(acao, dados = {}) {
     if (!C.apiUrl) {
       await new Promise((r) => setTimeout(r, 400));
