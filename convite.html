@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Meu convite · Mylli &amp; Rodolpho</title>
+  <meta property="og:title" content="Convite individual · Mylli & Rodolpho">
+  <meta property="og:description" content="Seu QR Code de entrada para o casamento. Apresente na recepção.">
+  <meta name="theme-color" content="#FAF3ED">
+  <meta name="robots" content="noindex">
+  <link rel="icon" href="assets/img/monograma.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,300;1,400;1,500&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/estilo.css">
+  <script src="assets/config.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js"></script>
+  <script src="assets/comum.js"></script>
+</head>
+<body>
+<main class="pagina">
+  <header class="topo">
+    <a class="voltar" href="index.html">‹ Convite</a>
+    <img class="monograma" src="assets/img/monograma.png" alt="Monograma M R">
+    <p class="rotulo">Convite individual</p>
+  </header>
+
+  <section class="ingresso">
+    <div class="moldura-dupla">
+      <div id="carregando"><p class="introducao">Carregando seu convite…</p></div>
+
+      <div id="valido" hidden>
+        <p class="rotulo" id="grupo">Convidado(a)</p>
+        <p class="nome" id="nome"></p>
+        <div class="qr" id="qr"></div>
+        <p class="codigo" id="codigo"></p>
+        <div class="info">
+          <span class="rotulo" data-c="diaSemana"></span>
+          <strong><span data-c="dia"></span> de <span data-c="mesExtenso"></span> de <span data-c="ano"></span> · <span data-c="hora"></span></strong>
+          <span class="rotulo" data-c="local"></span>
+          <span class="rotulo" data-c="endereco"></span>
+        </div>
+        <p class="introducao">Apresente este QR Code na recepção. Ele é pessoal e vale para uma entrada.</p>
+        <div class="pilha">
+          <a class="botao" data-href="mapsUrl" target="_blank" rel="noopener">Como chegar</a>
+          <a class="botao-sec" href="presentes.html">Lista de presentes</a>
+        </div>
+      </div>
+
+      <div id="invalido" hidden>
+        <h1 class="titulo-italico">Convite não encontrado</h1>
+        <svg class="onda" viewBox="0 0 120 20" aria-hidden="true"><path d="M2 9c18-7 36-7 54 0s36 7 62-3"/><path d="M14 15c15-4 30-4 44 0s30 5 48-1"/></svg>
+        <p class="introducao" id="motivo">Confira se o link está completo ou confirme sua presença novamente.</p>
+        <div class="pilha"><a class="botao" href="index.html#confirmar">Confirmar presença</a></div>
+      </div>
+    </div>
+  </section>
+</main>
+<script>
+(async function () {
+  const U = window.Convite;
+  const codigo = (new URLSearchParams(location.search).get('id') || '').toUpperCase().replace(/[^A-Z0-9]/g, '');
+  const ver = (id) => ['carregando', 'valido', 'invalido'].forEach((x) => { document.getElementById(x).hidden = x !== id; });
+  if (!codigo) return ver('invalido');
+  try {
+    const r = await U.api('convidado', { codigo });
+    if (r.resposta !== 'Confirmado') {
+      document.getElementById('motivo').textContent = 'Este nome está registrado como “não comparecerá”. Se mudou de ideia, responda novamente pelo link do seu convite.';
+      return ver('invalido');
+    }
+    document.getElementById('nome').textContent = r.nome;
+    if (r.convite) document.getElementById('grupo').textContent = r.convite;
+    document.getElementById('qr').innerHTML = U.qrSvg(U.linkConvite(codigo));
+    document.getElementById('codigo').textContent = 'Código ' + U.formatarCodigo(codigo);
+    ver('valido');
+  } catch (e) {
+    document.getElementById('motivo').textContent = e.message || 'Não foi possível carregar o convite agora.';
+    ver('invalido');
+  }
+})();
+</script>
+</body>
+</html>

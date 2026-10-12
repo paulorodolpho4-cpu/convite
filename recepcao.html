@@ -1,0 +1,141 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Recepção · Mylli &amp; Rodolpho</title>
+  <meta name="robots" content="noindex, nofollow">
+  <meta name="theme-color" content="#FAF3ED">
+  <link rel="icon" href="assets/img/monograma.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,300;1,400;1,500&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/estilo.css">
+  <script src="assets/config.js"></script>
+  <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+  <script src="assets/comum.js"></script>
+</head>
+<body>
+<main class="pagina">
+  <header class="topo">
+    <img class="monograma" src="assets/img/monograma.png" alt="Monograma M R">
+    <p class="rotulo">Uso da equipe</p>
+    <h1 class="titulo-italico">Recepção</h1>
+  </header>
+
+  <!-- Acesso -->
+  <section id="acesso" style="padding: 10px 22px 60px">
+    <form id="form-senha" novalidate>
+      <label class="campo"><span>Senha da recepção</span><input name="senha" type="password" autocomplete="current-password" required></label>
+      <button class="botao" type="submit">Entrar</button>
+      <p class="erro" role="alert"></p>
+    </form>
+  </section>
+
+  <!-- Leitura -->
+  <section id="leitura" hidden>
+    <div class="contadores">
+      <div class="contador-rec"><b id="n-chegaram">0</b><span class="rotulo">Chegaram</span></div>
+      <div class="contador-rec"><b id="n-confirmados">0</b><span class="rotulo">Confirmados</span></div>
+    </div>
+    <div class="leitor" id="leitor"></div>
+    <div class="resultado" id="resultado"><p class="estado">Aguardando leitura</p><p class="quem">Aponte a câmera para o QR Code</p></div>
+    <form class="manual" id="form-manual" novalidate>
+      <label class="campo" style="margin:0"><span>Ou digite o código</span><input name="codigo" autocomplete="off" autocapitalize="characters" placeholder="ABCD-EFGH"></label>
+      <button class="botao" type="submit">Validar</button>
+    </form>
+  </section>
+</main>
+<script>
+(function () {
+  const U = window.Convite;
+  const CHAVE = 'convite-recepcao-senha';
+  let senha = sessionStorage.getItem(CHAVE) || '';
+  let leitor = null, ocupado = false, ultimo = '', ultimoEm = 0;
+
+  const ESTADOS = {
+    ok: ['Entrada liberada', (r) => `Bem-vindo(a), ${r.nome}!`],
+    repetido: ['QR já utilizado', (r) => `${r.nome} · entrou às ${r.horario}`],
+    nao_confirmado: ['Não confirmado', (r) => `${r.nome} respondeu que não viria`],
+    invalido: ['QR inválido', () => 'Código não encontrado na lista']
+  };
+
+  function mostrarResultado(status, r) {
+    const el = document.getElementById('resultado');
+    const [estado, texto] = ESTADOS[status];
+    el.className = 'resultado ' + status;
+    el.innerHTML = `<p class="estado">${estado}</p><p class="quem"></p><p class="grupo"></p>`;
+    el.querySelector('.quem').textContent = texto(r);
+    el.querySelector('.grupo').textContent = r.convite ? 'Convite: ' + r.convite : '';
+    if (navigator.vibrate) navigator.vibrate(status === 'ok' ? 120 : [80, 60, 80]);
+  }
+
+  async function atualizarContadores() {
+    try {
+      const s = await U.api('estatisticas', { senha });
+      document.getElementById('n-chegaram').textContent = s.chegaram;
+      document.getElementById('n-confirmados').textContent = s.confirmados;
+    } catch (e) { /* mantém os últimos números */ }
+  }
+
+  function extrairCodigo(texto) {
+    try { const u = new URL(texto); return (u.searchParams.get('id') || '').toUpperCase(); }
+    catch (e) { return String(texto).toUpperCase().replace(/[^A-Z0-9]/g, ''); }
+  }
+
+  async function validar(texto) {
+    const codigo = extrairCodigo(texto);
+    const agora = Date.now();
+    if (!codigo || ocupado || (codigo === ultimo && agora - ultimoEm < 4000)) return;
+    ocupado = true; ultimo = codigo; ultimoEm = agora;
+    const el = document.getElementById('resultado');
+    el.className = 'resultado'; el.innerHTML = '<p class="estado">Verificando…</p><p class="quem">' + U.formatarCodigo(codigo) + '</p>';
+    try {
+      const r = await U.api('checkin', { codigo, senha });
+      mostrarResultado(r.status, r);
+      atualizarContadores();
+    } catch (e) {
+      el.className = 'resultado invalido';
+      el.innerHTML = '<p class="estado">Erro</p><p class="quem"></p>';
+      el.querySelector('.quem').textContent = e.message || 'Sem conexão. Tente de novo.';
+    } finally { ocupado = false; }
+  }
+
+  async function iniciar() {
+    document.getElementById('acesso').hidden = true;
+    document.getElementById('leitura').hidden = false;
+    atualizarContadores();
+    setInterval(atualizarContadores, 30000);
+    try {
+      leitor = new Html5Qrcode('leitor');
+      await leitor.start({ facingMode: 'environment' }, { fps: 10, qrbox: { width: 240, height: 240 } }, validar, () => {});
+    } catch (e) {
+      document.getElementById('leitor').outerHTML = '<p class="resultado invalido" style="margin:10px 16px">Não foi possível abrir a câmera. Permita o acesso à câmera ou digite o código abaixo.</p>';
+    }
+  }
+
+  document.getElementById('form-senha').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const f = e.currentTarget, erro = f.querySelector('.erro');
+    erro.textContent = '';
+    try {
+      await U.api('estatisticas', { senha: f.senha.value });
+      senha = f.senha.value;
+      sessionStorage.setItem(CHAVE, senha);
+      iniciar();
+    } catch (err) { erro.textContent = err.message || 'Senha incorreta.'; }
+  });
+
+  document.getElementById('form-manual').addEventListener('submit', (e) => {
+    e.preventDefault();
+    ultimo = '';
+    validar(e.currentTarget.codigo.value);
+    e.currentTarget.reset();
+  });
+
+  if (U.modoDemo) document.querySelector('#form-senha .campo span').textContent = 'Senha da recepção (demonstração: ' + U.SENHA_DEMO + ')';
+  if (senha) iniciar();
+})();
+</script>
+</body>
+</html>

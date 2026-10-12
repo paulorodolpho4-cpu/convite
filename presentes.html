@@ -1,0 +1,240 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Lista de presentes · Mylli &amp; Rodolpho</title>
+  <meta name="robots" content="noindex, nofollow">
+  <meta name="theme-color" content="#F8F3EE">
+  <link rel="icon" href="assets/img/monograma.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400;1,500&family=Jost:wght@300;400;500&family=Mrs+Saint+Delafield&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/estilo.css">
+  <script src="assets/config.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js"></script>
+  <script src="assets/comum.js"></script>
+</head>
+<body>
+<main class="pagina">
+  <div class="topo-foto">
+    <a class="voltar" id="voltar" href="index.html">‹ Convite</a>
+    <img src="assets/img/fotos/dunas-abraco.jpg" alt="Os noivos abraçados nas dunas">
+  </div>
+
+  <!-- Aparece logo após a confirmação de presença -->
+  <section class="confirmado" id="confirmado" hidden>
+    <p class="rotulo">Presença confirmada</p>
+    <h2 class="titulo-italico">Que alegria!</h2>
+    <p class="introducao" id="conf-texto"></p>
+    <div class="qrs" id="conf-qrs"></div>
+    <div class="pilha">
+      <a class="botao" id="conf-whatsapp" target="_blank" rel="noopener"></a>
+    </div>
+    <p class="nota">Apresentem os QR Codes na recepção. O botão abre o WhatsApp com os links para guardar.</p>
+  </section>
+
+  <header class="topo" style="padding-top:22px">
+    <img class="monograma" src="assets/img/monograma.png" alt="Monograma M R">
+    <p class="rotulo">Com carinho</p>
+    <h1 class="titulo-italico">Lista de presentes</h1>
+    <svg class="onda" viewBox="0 0 120 20" aria-hidden="true"><path d="M2 9c18-7 36-7 54 0s36 7 62-3"/><path d="M14 15c15-4 30-4 44 0s30 5 48-1"/></svg>
+    <p class="texto-topo">Sua presença é o nosso maior presente. Se quiser nos presentear, escolha um item e pague por Pix ou cartão de crédito.</p>
+  </header>
+  <div class="filtros" id="filtros" role="toolbar" aria-label="Filtrar por categoria"></div>
+  <section class="presentes" id="lista" aria-live="polite">
+    <p class="carregando">Carregando a lista…</p>
+  </section>
+</main>
+
+<dialog class="painel" id="dlg-presente" aria-labelledby="pres-titulo">
+  <button class="fechar" type="button" data-fechar aria-label="Fechar">×</button>
+  <div class="moldura-dupla">
+    <div id="pres-passo1">
+      <p class="rotulo">Presentear</p>
+      <h2 class="titulo-italico" id="pres-titulo"></h2>
+      <div class="resumo-presente"><p class="valor" id="pres-valor"></p></div>
+      <form id="form-presente" novalidate>
+        <label class="campo" id="campo-livre" hidden><span id="rotulo-livre">Valor do presente (R$)</span>
+          <input name="valor" type="text" inputmode="decimal" placeholder="Ex.: 500,00">
+        </label>
+        <div class="formas" role="radiogroup" aria-label="Forma de pagamento">
+          <label class="forma"><input type="radio" name="forma" value="Pix" checked><svg class="icone" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round" aria-hidden="true"><path d="M24 5 43 24 24 43 5 24z"/><path d="M15 17c3 0 5 1 7 3l2 2 2-2c2-2 4-3 7-3M15 31c3 0 5-1 7-3l2-2 2 2c2 2 4 3 7 3"/></svg>Pix</label>
+          <label class="forma" id="forma-cartao"><input type="radio" name="forma" value="Cartão"><svg class="icone" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" aria-hidden="true"><rect x="5" y="11" width="38" height="26" rx="3"/><path d="M5 19h38M11 30h8"/></svg>Cartão</label>
+        </div>
+        <label class="campo"><span>Seu nome completo</span><input name="nome" autocomplete="name" required></label>
+        <label class="campo"><span>Celular (WhatsApp)</span><input name="celular" type="tel" inputmode="numeric" autocomplete="tel-national" placeholder="(84) 99999-9999" required></label>
+        <label class="campo"><span>Mensagem aos noivos (opcional)</span><textarea name="mensagem" rows="2" maxlength="400" placeholder="Deixe um recado carinhoso"></textarea></label>
+        <button class="botao" type="submit">Continuar</button>
+        <p class="erro" role="alert"></p>
+      </form>
+    </div>
+
+    <div id="pres-pix" hidden>
+      <p class="rotulo">Pagamento via Pix</p>
+      <h2 class="titulo-italico">Quase lá!</h2>
+      <p class="introducao">Abra o app do seu banco e escolha <em>Pix › Ler QR Code</em> ou <em>Pix copia e cola</em>.</p>
+      <div class="qr" id="pix-qr"></div>
+      <p class="codigo" id="pix-valor"></p>
+      <textarea class="copia-cola" id="pix-codigo" readonly aria-label="Código Pix copia e cola"></textarea>
+      <div class="pilha">
+        <button class="botao" type="button" id="pix-copiar">Copiar código Pix</button>
+        <button class="botao-sec" type="button" data-fechar>Concluir</button>
+      </div>
+      <p class="nota">Presente registrado (protocolo <span id="pix-protocolo"></span>). Os noivos conferem o recebimento no extrato. Muito obrigado!</p>
+    </div>
+
+    <div id="pres-cartao" hidden>
+      <p class="rotulo">Pagamento com cartão</p>
+      <h2 class="titulo-italico">Quase lá!</h2>
+      <p class="introducao">Presente registrado (protocolo <span id="cartao-protocolo"></span>). Toque abaixo para pagar em ambiente seguro, parcelando conforme a operadora.</p>
+      <div class="pilha">
+        <a class="botao" id="cartao-link" target="_blank" rel="noopener">Ir para o pagamento</a>
+        <button class="botao-sec" type="button" data-fechar>Concluir</button>
+      </div>
+    </div>
+  </div>
+</dialog>
+
+<script>
+(function () {
+  const U = window.Convite, C = window.CONVITE;
+  const $ = (id) => document.getElementById(id);
+  const lista = $('lista'), dlg = $('dlg-presente'), form = $('form-presente');
+  const erro = form.querySelector('.erro');
+  U.mascaraCelular(form.celular);
+  const codigoConvite = U.codigoConvite();
+  if (codigoConvite) $('voltar').href = 'index.html?c=' + codigoConvite;
+
+  let dados = null, atual = null, filtro = 'Todos';
+  const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+  const imagem = (img) => /^https?:\/\//i.test(img || '')
+    ? `<img src="${esc(img)}" alt="" loading="lazy">`
+    : U.icone(String(img || '').replace(/^icone:/, '') || 'presente');
+
+  /* ----- QR Codes de quem acabou de confirmar ----- */
+  async function mostrarConfirmacao() {
+    if (!codigoConvite) return;
+    const params = new URLSearchParams(location.search);
+    try {
+      const c = await U.api('convite', { codigo: codigoConvite });
+      const pessoas = (c.pessoas || []).filter((p) => p.resposta === 'Confirmado');
+      if (!pessoas.length || (!params.has('confirmado') && !params.has('qr'))) return;
+      $('conf-texto').textContent = pessoas.length === 1
+        ? `Obrigado, ${U.primeiroNome(pessoas[0].nome)}! Este é o seu QR Code de entrada.`
+        : `Obrigado, ${c.nome}! Cada pessoa tem o seu QR Code de entrada.`;
+      $('conf-qrs').classList.toggle('um', pessoas.length === 1);
+      $('conf-qrs').innerHTML = pessoas.map((p) => `<div class="qr-pessoa"><p class="nome">${esc(p.nome)}</p><div class="qr">${U.qrSvg(U.linkConvite(p.codigo))}</div><p class="codigo">${U.formatarCodigo(p.codigo)}</p><a href="${U.linkConvite(p.codigo)}">Abrir convite</a></div>`).join('');
+      let cel = ''; try { cel = localStorage.getItem('convite-celular') || ''; } catch (x) {}
+      const w = $('conf-whatsapp');
+      w.href = 'https://wa.me/' + (cel ? '55' + cel : '') + '?text=' + encodeURIComponent(U.mensagemWhatsApp(pessoas));
+      w.innerHTML = U.icone('whatsapp') + 'Salvar no meu WhatsApp';
+      $('confirmado').hidden = false;
+    } catch (e) { /* sem confirmação para exibir */ }
+  }
+
+  /* ----- Lista ----- */
+  function desenharFiltros() {
+    const cats = ['Todos', ...new Set(dados.presentes.map((p) => p.categoria).filter(Boolean))];
+    $('filtros').hidden = cats.length < 3;
+    $('filtros').innerHTML = cats.map((c) => `<button type="button" aria-pressed="${c === filtro}">${esc(c)}</button>`).join('');
+  }
+  function desenharLista() {
+    const itens = dados.presentes.map((p, i) => ({ p, i })).filter(({ p }) => filtro === 'Todos' || p.categoria === filtro);
+    lista.innerHTML = itens.map(({ p, i }) => {
+      const esgotado = p.quantidade > 0 && p.recebidos >= p.quantidade;
+      const restam = p.quantidade > 1 && !esgotado ? `<p class="cotas">${p.quantidade - p.recebidos} de ${p.quantidade} cotas disponíveis</p>` : '';
+      return `<article class="presente revelar${esgotado ? ' esgotado' : ''}">
+        <div class="imagem">${imagem(p.imagem)}</div>
+        <h3>${esc(p.nome)}</h3>
+        <p class="desc">${esc(p.descricao)}</p>
+        <p class="preco">${p.valor > 0 ? U.reais(p.valor) + (p.quantidade > 1 ? ' <small>/ cota</small>' : '') : 'A partir de ' + U.reais(dados.valorMinimo)}</p>${restam}
+        <button class="botao" type="button" data-i="${i}" ${esgotado ? 'disabled' : ''}>${esgotado ? 'Presenteado ♡' : 'Presentear'}</button>
+      </article>`;
+    }).join('');
+    U.animarAoRolar();
+  }
+  async function carregar() {
+    try {
+      dados = await U.api('presentes');
+      dados.valorMinimo = Number(dados.valorMinimo) || C.valorMinimo || 0;
+      if (!dados.presentes.length) { lista.innerHTML = '<p class="carregando">A lista de presentes será publicada em breve.</p>'; return; }
+      desenharFiltros();
+      desenharLista();
+    } catch (e) {
+      lista.innerHTML = '<p class="carregando">Não foi possível carregar a lista agora. Tente novamente em instantes.</p>';
+    }
+  }
+  $('filtros').addEventListener('click', (e) => {
+    const b = e.target.closest('button');
+    if (!b) return;
+    filtro = b.textContent;
+    desenharFiltros(); desenharLista();
+  });
+
+  function mostrar(id) {
+    ['pres-passo1', 'pres-pix', 'pres-cartao'].forEach((x) => { $(x).hidden = x !== id; });
+    dlg.scrollTop = 0;
+  }
+
+  lista.addEventListener('click', (e) => {
+    const b = e.target.closest('button[data-i]');
+    if (!b || b.disabled) return;
+    atual = dados.presentes[+b.dataset.i];
+    $('pres-titulo').textContent = atual.nome;
+    $('pres-valor').textContent = atual.valor > 0 ? U.reais(atual.valor) : 'Valor livre';
+    $('campo-livre').hidden = atual.valor > 0;
+    $('rotulo-livre').textContent = `Valor do presente (mínimo ${U.reais(dados.valorMinimo)})`;
+    $('forma-cartao').style.display = atual.linkCartao ? '' : 'none';
+    form.forma.value = 'Pix';
+    erro.textContent = '';
+    mostrar('pres-passo1');
+    dlg.showModal();
+  });
+
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    erro.textContent = '';
+    const nome = form.nome.value.trim().replace(/\s+/g, ' ');
+    const celular = U.soDigitos(form.celular.value);
+    const forma = form.forma.value;
+    let valor = atual.valor;
+    if (!(valor > 0)) {
+      valor = parseFloat(String(form.valor.value).replace(/[^\d,.]/g, '').replace(/\./g, '').replace(',', '.'));
+      if (!(valor >= dados.valorMinimo)) { erro.textContent = `O valor mínimo é ${U.reais(dados.valorMinimo)}.`; form.valor.focus(); return; }
+    }
+    if (nome.split(' ').length < 2) { erro.textContent = 'Informe seu nome completo.'; form.nome.focus(); return; }
+    if (celular.length < 10 || celular.length > 11) { erro.textContent = 'Informe um celular válido com DDD.'; form.celular.focus(); return; }
+
+    const botao = form.querySelector('button[type=submit]');
+    botao.disabled = true; botao.textContent = 'Registrando…';
+    try {
+      const r = await U.api('presente', { codigo: atual.codigo, valor, forma, nome, celular, mensagem: form.mensagem.value.trim(), convite: codigoConvite });
+      if (forma === 'Pix') {
+        const pix = U.pixCopiaECola({ ...dados.pix, valor, txid: r.protocolo });
+        $('pix-qr').innerHTML = U.qrSvg(pix);
+        $('pix-codigo').value = pix;
+        $('pix-valor').textContent = U.reais(valor);
+        $('pix-protocolo').textContent = r.protocolo;
+        mostrar('pres-pix');
+      } else {
+        $('cartao-link').href = atual.linkCartao;
+        $('cartao-protocolo').textContent = r.protocolo;
+        mostrar('pres-cartao');
+      }
+      form.reset();
+      carregar();
+    } catch (err) {
+      erro.textContent = err.message || 'Não foi possível registrar. Tente novamente.';
+    } finally {
+      botao.disabled = false; botao.textContent = 'Continuar';
+    }
+  });
+
+  $('pix-copiar').addEventListener('click', (e) => U.copiar($('pix-codigo').value, e.currentTarget));
+  mostrarConfirmacao();
+  carregar();
+})();
+</script>
+</body>
+</html>

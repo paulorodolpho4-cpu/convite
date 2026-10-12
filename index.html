@@ -1,0 +1,350 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Mylli &amp; Rodolpho · Convite de casamento</title>
+  <meta name="description" content="Convite de casamento de Mylli & Rodolpho. Confirme sua presença.">
+  <meta property="og:title" content="Mylli & Rodolpho · 17·12·26">
+  <meta property="og:description" content="Com alegria, convidamos você para a celebração do nosso casamento.">
+  <meta name="robots" content="noindex, nofollow">
+  <meta name="theme-color" content="#F8F3EE">
+  <link rel="icon" href="assets/img/monograma.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400;1,500&family=Jost:wght@300;400;500&family=Mrs+Saint+Delafield&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/estilo.css">
+  <script src="assets/config.js"></script>
+  <script src="assets/comum.js"></script>
+</head>
+<body class="travado">
+
+<!-- Abertura: o toque inicia a música (os navegadores só tocam som após um toque) -->
+<div class="abertura" id="abertura" role="dialog" aria-label="Abrir convite">
+  <div class="conteudo">
+    <img class="monograma" src="assets/img/monograma.png" alt="Monograma M R, 17·12·26">
+    <p class="rotulo">Você está convidado</p>
+    <p class="para" id="para-nome">Com muito carinho</p>
+    <p class="rotulo tipo" id="para-tipo">&nbsp;</p>
+    <button class="botao-pilula cheio pulsa" type="button" id="abrir">Abrir convite</button>
+    <p class="dica"><span data-icone="musica"></span>Com música · aumente o volume</p>
+  </div>
+</div>
+
+<main class="pagina">
+
+  <!-- Capa -->
+  <section class="hero">
+    <img src="assets/img/fotos/beijo-mao.jpg" alt="Rodolpho beija a mão de Mylli ao pôr do sol" fetchpriority="high">
+    <div class="sobre">
+      <p class="rotulo">O nosso casamento</p>
+      <h1><span data-c="noivos.ela"></span><span class="e">&amp;</span><span data-c="noivos.ele"></span></h1>
+      <p class="data-capa" data-c="dataCurta"></p>
+    </div>
+  </section>
+
+  <!-- Convite -->
+  <section class="secao">
+    <p class="rotulo revelar">Você é nosso convidado</p>
+    <svg class="onda revelar" viewBox="0 0 120 20" aria-hidden="true"><path d="M2 9c18-7 36-7 54 0s36 7 62-3"/><path d="M14 15c15-4 30-4 44 0s30 5 48-1"/></svg>
+    <p class="texto revelar atraso-1" data-c="textoConvite"></p>
+  </section>
+
+  <figure class="foto-cheia revelar" style="margin:0"><img src="assets/img/fotos/cabana-beijo.jpg" alt="Os noivos sob a cabana de palha" loading="lazy"></figure>
+
+  <!-- Data e contador -->
+  <section class="secao">
+    <p class="texto-maiusc revelar">Dizemos sim para o amor no dia</p>
+    <p class="data-grande revelar atraso-1"><span data-c="dia"></span>.12.<span id="ano-curto"></span></p>
+    <p class="rotulo revelar atraso-2"><span data-c="diaSemana"></span> · às <span data-c="hora"></span></p>
+    <div class="contador revelar atraso-2" id="contador" aria-live="off">
+      <div><b data-tempo="dias">00</b><span>dias</span></div>
+      <div><b data-tempo="horas">00</b><span>horas</span></div>
+      <div><b data-tempo="minutos">00</b><span>min</span></div>
+      <div><b data-tempo="segundos">00</b><span>seg</span></div>
+    </div>
+    <p class="contador-msg revelar">para o grande dia</p>
+  </section>
+
+  <div class="colagem revelar">
+    <img src="assets/img/fotos/gramado-caminhando.jpg" alt="Os noivos caminhando de mãos dadas no gramado" loading="lazy">
+    <img src="assets/img/fotos/cabana-pose.jpg" alt="Os noivos posando em frente à cabana" loading="lazy">
+    <img src="assets/img/fotos/dunas-abraco.jpg" alt="Os noivos abraçados nas dunas" loading="lazy">
+  </div>
+
+  <!-- Nossa história -->
+  <section class="secao" style="padding-top:70px">
+    <p class="rotulo revelar">Nossa história</p>
+    <h2 class="titulo-italico revelar">Do primeiro olhar ao “sim”</h2>
+    <ol class="linha-tempo" id="historia"></ol>
+  </section>
+
+  <figure class="foto-cheia revelar" style="margin:-20px 0 0"><img src="assets/img/fotos/beijo-sol.jpg" alt="Os noivos se beijando sob o sol" loading="lazy"></figure>
+
+  <section class="secao">
+    <figure class="versiculo revelar">
+      <blockquote data-c="versiculo1"></blockquote>
+      <figcaption class="rotulo" data-c="versiculo1Ref"></figcaption>
+    </figure>
+  </section>
+
+  <div class="colagem revelar">
+    <img src="assets/img/fotos/abraco-dourado.jpg" alt="Abraço dos noivos na luz dourada" loading="lazy">
+    <img src="assets/img/fotos/gramado-sentados.jpg" alt="Os noivos sentados no gramado" loading="lazy">
+    <img src="assets/img/fotos/cabana-carinho.jpg" alt="Rodolpho beija Mylli em frente à cabana" loading="lazy">
+  </div>
+
+  <section class="secao" style="padding-top:70px">
+    <figure class="versiculo revelar">
+      <blockquote data-c="versiculo2"></blockquote>
+      <figcaption class="rotulo" data-c="versiculo2Ref"></figcaption>
+    </figure>
+  </section>
+
+  <aside class="deus-ama revelar">
+    <span data-icone="aliancas"></span>
+    <p class="rotulo">Um recado do coração</p>
+    <h2>Deus ama casamentos</h2>
+    <p data-c="deusAma"></p>
+  </aside>
+
+  <figure class="foto-cheia larga revelar" style="margin:30px 0 0"><img src="assets/img/fotos/cabana-caminhando.jpg" alt="Os noivos caminhando diante da cabana" loading="lazy"></figure>
+
+  <!-- Local e botões -->
+  <section class="secao local">
+    <p class="script revelar">local</p>
+    <p class="rotulo revelar">Cerimônia &amp; recepção</p>
+    <h2 class="revelar" data-c="local"></h2>
+    <p class="rotulo revelar" data-c="endereco"></p>
+    <hr class="divisor revelar">
+    <p class="clique revelar"><span data-icone="toque"></span>Clique no botão:</p>
+    <nav class="pilulas revelar atraso-1" aria-label="Ações do convite">
+      <a class="botao-pilula" data-href="mapsUrl" target="_blank" rel="noopener">Localização</a>
+      <a class="botao-pilula" id="link-presentes" href="presentes.html">Lista de presentes</a>
+      <button class="botao-pilula cheio pulsa" type="button" data-abrir="rsvp">Confirmação de presença</button>
+    </nav>
+  </section>
+
+  <!-- Avisos -->
+  <section class="secao avisos" style="padding-top:20px">
+    <p class="rotulo revelar">Para o grande dia</p>
+    <div class="grade">
+      <div class="aviso-item revelar"><span class="circulo" data-icone="relogio"></span><p>Pontualidade<small>início às <span data-c="hora"></span></small></p></div>
+      <div class="aviso-item revelar atraso-1"><span class="circulo" data-icone="cabide"></span><p>Traje<small data-c="traje"></small></p></div>
+      <div class="aviso-item revelar atraso-2"><span class="circulo" data-icone="calendario"></span><p>Confirme<small>até <span data-c="confirmarAte"></span></small></p></div>
+    </div>
+  </section>
+
+  <!-- Encerramento -->
+  <footer class="final">
+    <p class="script revelar"><span class="escrever">Esperamos você!</span></p>
+    <div class="foto">
+      <img src="assets/img/fotos/beijo-close.jpg" alt="Os noivos quase se beijando" loading="lazy">
+      <p class="rodape"><span><span data-c="noivos.ela"></span> &amp; <span data-c="noivos.ele"></span></span><span data-c="dataCurta"></span></p>
+    </div>
+  </footer>
+</main>
+
+<button class="musica" type="button" id="musica" aria-label="Pausar música" hidden></button>
+<div id="player-musica" aria-hidden="true"></div>
+
+<!-- Painel de confirmação de presença -->
+<dialog class="painel" id="rsvp" aria-labelledby="rsvp-titulo">
+  <button class="fechar" type="button" data-fechar aria-label="Fechar">×</button>
+  <div class="moldura-dupla">
+
+    <!-- Sem código: pede o código impresso no PDF -->
+    <div id="rsvp-codigo" hidden>
+      <p class="rotulo">Confirmação de presença</p>
+      <h2 class="titulo-italico">Seu convite</h2>
+      <p class="aviso-convite">Digite o <strong>código do convite</strong>, impresso no final do PDF que você recebeu (ex.: C3-ABCDE).</p>
+      <form id="form-codigo" novalidate>
+        <label class="campo codigo-convite"><span>Código do convite</span><input name="codigo" autocomplete="off" autocapitalize="characters" placeholder="C0-XXXXX" required></label>
+        <button class="botao" type="submit">Continuar</button>
+        <p class="erro" role="alert"></p>
+      </form>
+    </div>
+
+    <div id="rsvp-formulario" hidden>
+      <p class="rotulo">Confirmação de presença</p>
+      <h2 class="titulo-italico" id="rsvp-titulo">Você vem?</h2>
+      <p class="introducao" id="rsvp-convite"></p>
+      <p class="aviso-convite" id="rsvp-aviso"></p>
+      <form id="form-rsvp" novalidate>
+        <fieldset class="opcoes">
+          <legend>Sua resposta</legend>
+          <label class="opcao"><input type="radio" name="resposta" value="Confirmado" checked><span class="marca"></span><span id="txt-sim">Sim, estaremos presentes</span></label>
+          <label class="opcao"><input type="radio" name="resposta" value="Não comparecerá"><span class="marca"></span><span id="txt-nao">Infelizmente não poderemos ir</span></label>
+        </fieldset>
+        <fieldset class="nomes-convidados">
+          <legend id="legenda-nomes">Quem vai</legend>
+          <p class="ajuda" id="ajuda-nomes"></p>
+          <div id="lista-nomes"></div>
+        </fieldset>
+        <label class="campo"><span>Celular para contato (WhatsApp)</span>
+          <input name="celular" type="tel" inputmode="numeric" autocomplete="tel-national" placeholder="(84) 99999-9999" required>
+        </label>
+        <p class="prazo">Por favor, responda até <span data-c="confirmarAte"></span>.</p>
+        <button class="botao" type="submit">Enviar resposta</button>
+        <p class="erro" role="alert"></p>
+      </form>
+    </div>
+
+    <div id="rsvp-recusa" hidden>
+      <p class="rotulo">Resposta registrada</p>
+      <h2 class="titulo-italico">Sentiremos sua falta</h2>
+      <svg class="onda" viewBox="0 0 120 20" aria-hidden="true"><path d="M2 9c18-7 36-7 54 0s36 7 62-3"/><path d="M14 15c15-4 30-4 44 0s30 5 48-1"/></svg>
+      <p class="introducao">Obrigado por nos avisar. Se mudar de ideia, é só responder novamente por este convite.</p>
+      <div class="pilha"><a class="botao-sec" id="recusa-presentes" href="presentes.html">Ver lista de presentes</a></div>
+    </div>
+  </div>
+</dialog>
+
+<script>
+(function () {
+  const U = window.Convite, C = window.CONVITE;
+  const $ = (id) => document.getElementById(id);
+  const dialogo = $('rsvp');
+  let convite = null; // { codigo, tipo, nome, pessoas }
+
+  document.getElementById('ano-curto').textContent = String(C.ano).slice(-2);
+  U.iniciarContador($('contador'));
+
+  // Nossa história (vem do config.js)
+  $('historia').innerHTML = C.historia.map((h, i) =>
+    `<li class="revelar${i ? ' atraso-1' : ''}"><span class="quando">${h.data}</span><h3>${h.titulo}</h3><p>${h.texto}</p></li>`).join('');
+  U.animarAoRolar();
+
+  /* ----- Convite personalizado pelo código do PDF ----- */
+  const codigo = U.codigoConvite();
+  const comCodigo = (url) => codigo ? url + (url.includes('?') ? '&' : '?') + 'c=' + encodeURIComponent(codigo) : url;
+  $('link-presentes').href = comCodigo('presentes.html');
+  $('recusa-presentes').href = comCodigo('presentes.html');
+
+  function aplicarConvite(c) {
+    convite = c;
+    $('para-nome').textContent = c.nome;
+    $('para-tipo').textContent = c.tipo === 1 ? 'Convite individual' : `Convite para ${c.tipo} pessoas`;
+  }
+  async function carregarConvite(cod) {
+    const c = await U.api('convite', { codigo: cod });
+    aplicarConvite(c);
+    return c;
+  }
+  if (codigo) carregarConvite(codigo).catch(() => {});
+
+  /* ----- Abertura e música de fundo (YouTube) ----- */
+  const botaoMusica = $('musica');
+  let player = null, prontoPlayer = false, querTocar = false;
+  function iconeMusica(tocando) {
+    botaoMusica.innerHTML = U.icone(tocando ? 'musica' : 'mudo');
+    botaoMusica.classList.toggle('tocando', tocando);
+    botaoMusica.setAttribute('aria-label', tocando ? 'Pausar música' : 'Tocar música');
+  }
+  window.onYouTubeIframeAPIReady = function () {
+    player = new YT.Player('player-musica', {
+      width: 1, height: 1, videoId: C.musicaYoutube,
+      playerVars: { autoplay: 0, controls: 0, loop: 1, playlist: C.musicaYoutube, playsinline: 1, rel: 0 },
+      events: {
+        onReady: () => { prontoPlayer = true; player.setVolume(70); if (querTocar) player.playVideo(); },
+        onStateChange: (e) => iconeMusica(e.data === YT.PlayerState.PLAYING || e.data === YT.PlayerState.BUFFERING)
+      }
+    });
+  };
+  if (C.musicaYoutube) {
+    const s = document.createElement('script');
+    s.src = 'https://www.youtube.com/iframe_api';
+    document.head.appendChild(s);
+  }
+  $('abrir').addEventListener('click', () => {
+    querTocar = true;
+    if (prontoPlayer) player.playVideo();
+    $('abertura').classList.add('aberta');
+    document.body.classList.remove('travado');
+    if (C.musicaYoutube) { botaoMusica.hidden = false; iconeMusica(prontoPlayer); }
+    setTimeout(() => { $('abertura').hidden = true; if (location.hash === '#confirmar') abrirRsvp(); }, 1100);
+  });
+  botaoMusica.addEventListener('click', () => {
+    if (!player || !prontoPlayer) return;
+    if (player.getPlayerState() === YT.PlayerState.PLAYING) player.pauseVideo(); else player.playVideo();
+  });
+
+  /* ----- Confirmação de presença ----- */
+  const form = $('form-rsvp');
+  U.mascaraCelular(form.celular);
+  function mostrar(id) {
+    ['rsvp-codigo', 'rsvp-formulario', 'rsvp-recusa'].forEach((x) => { $(x).hidden = x !== id; });
+    dialogo.scrollTop = 0;
+  }
+  function montarFormulario() {
+    const n = convite.tipo, vai = form.resposta.value === 'Confirmado';
+    $('rsvp-convite').textContent = convite.nome;
+    $('rsvp-aviso').innerHTML = n === 1
+      ? 'Este convite é <strong>individual</strong>. Ao confirmar, você recebe um QR Code único, que será o seu convite de entrada.'
+      : `Este convite é válido para <strong>até ${n} pessoas</strong>. Informe o nome completo de cada pessoa que irá; cada uma receberá o seu próprio QR Code de entrada.`;
+    $('txt-sim').textContent = n === 1 ? 'Sim, estarei presente' : 'Sim, estaremos presentes';
+    $('txt-nao').textContent = n === 1 ? 'Infelizmente não poderei ir' : 'Infelizmente não poderemos ir';
+    $('legenda-nomes').textContent = vai ? (n === 1 ? 'Seu nome completo' : 'Nome completo de quem vai') : 'Seu nome completo';
+    $('ajuda-nomes').textContent = vai && n > 1 ? `Deixe em branco os lugares de quem não poderá ir (máximo ${n}).` : '';
+    const atuais = [...$('lista-nomes').querySelectorAll('input')].map((i) => i.value);
+    const confirmados = (convite.pessoas || []).filter((p) => p.resposta === 'Confirmado').map((p) => p.nome);
+    const vagas = vai ? n : 1;
+    $('lista-nomes').innerHTML = Array.from({ length: vagas }, (_, i) =>
+      `<label class="nome-pessoa"><span class="n">${vagas > 1 ? i + 1 + '.' : ''}</span><input name="nome${i}" autocomplete="${i ? 'off' : 'name'}" placeholder="${i ? 'Nome completo (opcional)' : 'Nome completo'}" aria-label="Nome completo da pessoa ${i + 1}"></label>`).join('');
+    $('lista-nomes').querySelectorAll('input').forEach((inp, i) => { inp.value = atuais[i] || confirmados[i] || ''; });
+  }
+  form.querySelectorAll('input[name=resposta]').forEach((r) => r.addEventListener('change', montarFormulario));
+
+  function abrirRsvp() {
+    form.querySelector('.erro').textContent = '';
+    if (convite) { montarFormulario(); mostrar('rsvp-formulario'); } else mostrar('rsvp-codigo');
+    if (!dialogo.open) dialogo.showModal();
+  }
+  document.querySelectorAll('[data-abrir="rsvp"]').forEach((b) => b.addEventListener('click', (e) => { e.stopImmediatePropagation(); e.preventDefault(); abrirRsvp(); }, true));
+
+  $('form-codigo').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const f = e.currentTarget, erro = f.querySelector('.erro'), cod = U.normalizarCodigoConvite(f.codigo.value);
+    erro.textContent = '';
+    if (!cod) { erro.textContent = 'Código inválido. Ele começa com C1 a C5, seguido de 5 letras ou números.'; return; }
+    try {
+      await carregarConvite(cod);
+      try { localStorage.setItem('convite-codigo', cod); } catch (x) {}
+      history.replaceState(null, '', '?c=' + cod);
+      $('link-presentes').href = 'presentes.html?c=' + cod;
+      $('recusa-presentes').href = 'presentes.html?c=' + cod;
+      montarFormulario(); mostrar('rsvp-formulario');
+    } catch (err) { erro.textContent = err.message; }
+  });
+
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const erro = form.querySelector('.erro');
+    erro.textContent = '';
+    const resposta = form.resposta.value;
+    const nomes = [...$('lista-nomes').querySelectorAll('input')].map((i) => i.value.trim().replace(/\s+/g, ' ')).filter(Boolean);
+    const celular = U.soDigitos(form.celular.value);
+    if (!nomes.length) { erro.textContent = 'Informe ao menos um nome completo.'; return; }
+    if (nomes.some((n) => n.split(' ').length < 2)) { erro.textContent = 'Informe nome e sobrenome de cada pessoa.'; return; }
+    if (new Set(nomes.map((n) => n.toLowerCase())).size !== nomes.length) { erro.textContent = 'Há nomes repetidos.'; return; }
+    if (celular.length < 10 || celular.length > 11) { erro.textContent = 'Informe um celular válido com DDD.'; form.celular.focus(); return; }
+
+    const botao = form.querySelector('button[type=submit]');
+    botao.disabled = true; botao.textContent = 'Enviando…';
+    try {
+      const r = await U.api('confirmar', { codigo: convite.codigo, celular, resposta, nomes });
+      convite.pessoas = r.pessoas;
+      if (resposta !== 'Confirmado') { mostrar('rsvp-recusa'); return; }
+      try { localStorage.setItem('convite-celular', celular); } catch (x) {}
+      // Após confirmar, o convidado segue para a lista de presentes, onde vê os QR Codes
+      location.href = 'presentes.html?c=' + encodeURIComponent(convite.codigo) + '&confirmado=1';
+    } catch (err) {
+      erro.textContent = err.message || 'Não foi possível enviar. Verifique sua conexão e tente novamente.';
+    } finally {
+      botao.disabled = false; botao.textContent = 'Enviar resposta';
+    }
+  });
+})();
+</script>
+</body>
+</html>
