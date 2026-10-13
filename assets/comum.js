@@ -140,7 +140,10 @@
     fechadura: '<rect x="14" y="5" width="20" height="38" rx="4"/><path d="M19 12h10v12H19z"/><circle cx="24" cy="33" r="3"/>',
     toalha: '<path d="M9 8h30v6H9zM12 14v26h24V14M12 31h24M12 35h24"/>',
     aspirador: '<path d="M31 5l-8 31M23 36h-9a4 4 0 0 0 0 8h12a4 4 0 0 0 0-8M27 5h8"/>',
-    dividir: '<circle cx="17" cy="16" r="6"/><circle cx="33" cy="16" r="6"/><path d="M5 40c0-7 5-12 12-12s12 5 12 12M23 31c2-2 6-3 10-3 7 0 12 5 12 12"/>'
+    microondas: '<rect x="5" y="11" width="38" height="26" rx="3"/><rect x="10" y="16" width="20" height="16" rx="1"/><path d="M36 17v2M36 23v2M36 29v2"/>',
+    ferro: '<path d="M6 34h30a6 6 0 0 0 6-6c0-8-6-14-16-14H14z"/><path d="M18 14v-4h10M12 28h20"/>',
+    luminaria: '<path d="M16 6h16l6 16H10z"/><path d="M24 22v16M16 42h16"/>',
+    pote: '<rect x="10" y="16" width="28" height="24" rx="4"/><path d="M8 10h32v6H8zM16 26h16"/>',    dividir: '<circle cx="17" cy="16" r="6"/><circle cx="33" cy="16" r="6"/><path d="M5 40c0-7 5-12 12-12s12 5 12 12M23 31c2-2 6-3 10-3 7 0 12 5 12 12"/>'
   };
   function icone(nome, classe = 'icone') {
     return `<svg class="${classe}" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ICONES[nome] || ICONES.presente}</svg>`;
@@ -149,35 +152,44 @@
   /* ---------- Lista de presentes usada no modo demonstração ---------- */
   const P = (codigo, categoria, nome, descricao, valor, imagem, quantidade = 1) => ({ codigo, categoria, nome, descricao, valor, imagem: 'icone:' + imagem, linkCartao: '', linkCartaoMetade: '', quantidade });
   const PRESENTES_EXEMPLO = [
-    P('P01', 'Cozinha', 'Air fryer forno 12 litros', 'A queridinha das cozinhas: assa, gratina e frita sem óleo.', 650, 'airfryer'),
-    P('P02', 'Cozinha', 'Cafeteira Nespresso Vertuo', 'Com kit de cápsulas para o café da manhã a dois.', 900, 'cafe'),
-    P('P03', 'Cozinha', 'Batedeira planetária', 'Estilo KitchenAid, para bolos e receitas de domingo.', 2800, 'batedeira'),
-    P('P04', 'Cozinha', 'Jogo de panelas cerâmicas', 'Antiaderentes, coloridas e livres de PFOA.', 900, 'panelas'),
-    P('P05', 'Cozinha', 'Panela de pressão elétrica', 'Multifuncional: arroz, feijão e carnes com um toque.', 550, 'panelas'),
-    P('P06', 'Cozinha', 'Liquidificador de alta potência', 'Para sucos, vitaminas e smoothies.', 450, 'liquidificador'),
-    P('P07', 'Cozinha', 'Aparelho de jantar 30 peças', 'Para receber a família e os amigos.', 650, 'jantar'),
-    P('P08', 'Cozinha', 'Faqueiro inox 72 peças', 'Completo, para todas as ocasiões.', 500, 'jantar'),
-    P('P09', 'Cozinha', 'Jogo de taças de cristal', 'Para brindarmos cada conquista.', 380, 'brinde'),
-    P('P10', 'Cozinha', 'Kit churrasco premium', 'Facas, tábua e acessórios para os encontros em casa.', 400, 'churrasco'),
-    P('P11', 'Eletros', 'Geladeira frost free inverse', 'Freezer embaixo e muito espaço para a casa nova.', 4500, 'geladeira'),
-    P('P12', 'Eletros', 'Lava e seca', 'Roupa limpa e seca sem varal.', 3800, 'lavar'),
-    P('P13', 'Eletros', 'Lava-louças', 'Porque a louça não vai se lavar sozinha… ou vai!', 2900, 'lavar'),
-    P('P14', 'Eletros', 'Robô aspirador e passa pano', 'Tempo juntos vale mais que faxina.', 1900, 'robo'),
-    P('P15', 'Eletros', 'Ar-condicionado split inverter', 'Noites fresquinhas no calor de Natal.', 2600, 'ar'),
-    P('P16', 'Eletros', 'Purificador de água', 'Água gelada e filtrada direto na cozinha.', 900, 'gota'),
-    P('P17', 'Eletros', 'Aspirador vertical sem fio', 'Leve, prático e sempre à mão.', 800, 'aspirador'),
-    P('P18', 'Casa', 'Smart TV 55" 4K', 'Para as noites de filme e série.', 3200, 'tv'),
-    P('P19', 'Casa', 'Sofá retrátil', 'O cantinho mais aconchegante do primeiro lar.', 3500, 'sofa'),
-    P('P20', 'Casa', 'Assistente de voz com tela', 'Música, receitas e lembretes com um comando.', 700, 'assistente'),
-    P('P21', 'Casa', 'Fechadura digital', 'Entrar em casa com senha ou digital.', 900, 'fechadura'),
-    P('P22', 'Casa', 'Plantas e vasos para a varanda', 'Um toque de verde na casa nova.', 300, 'planta', 2),
-    P('P23', 'Cama & banho', 'Colchão e base box casal', 'Noites de sono perfeitas.', 3000, 'cama'),
-    P('P24', 'Cama & banho', 'Jogo de cama 400 fios', 'Lençóis macios, tamanho queen.', 450, 'cama'),
-    P('P25', 'Cama & banho', 'Kit de toalhas felpudas', 'Banho e rosto, para o casal e as visitas.', 350, 'toalha'),
-    P('P26', 'Cama & banho', 'Edredom e manta', 'Aconchego para os dias de chuva.', 380, 'cama'),
-    P('P27', 'Contribuição', 'Contribuição livre', 'Escolha o valor que desejar.', 0, 'coracao', 0)
-  ];
-  const LIMITE_DIVIDIR_DEMO = 1500;
+    P('P01', 'Eletros', 'Geladeira frost free', 'Muito espaço para a casa nova.', 2800, 'geladeira'),
+    P('P02', 'Eletros', 'Lava e seca', 'Roupa limpa e seca sem varal.', 2500, 'lavar'),
+    P('P03', 'Casa', 'Smart TV 50" 4K', 'Para as noites de filme e série.', 2200, 'tv'),
+    P('P04', 'Casa', 'Sofá retrátil', 'O cantinho mais aconchegante do primeiro lar.', 1900, 'sofa'),
+    P('P05', 'Eletros', 'Ar-condicionado split inverter', 'Noites fresquinhas no calor de Natal.', 1900, 'ar'),
+    P('P06', 'Cama & banho', 'Colchão box casal', 'Noites de sono perfeitas.', 1800, 'cama'),
+    P('P07', 'Eletros', 'Robô aspirador', 'Tempo juntos vale mais que faxina.', 1200, 'robo'),
+    P('P08', 'Cozinha', 'Batedeira planetária', 'Para bolos e receitas de domingo.', 1100, 'batedeira'),
+    P('P09', 'Eletros', 'Micro-ondas', 'O ajudante de todos os dias.', 800, 'microondas'),
+    P('P10', 'Cozinha', 'Cafeteira Nespresso', 'Com cápsulas para o café da manhã a dois.', 750, 'cafe'),
+    P('P11', 'Eletros', 'Purificador de água', 'Água gelada e filtrada na cozinha.', 700, 'gota'),
+    P('P12', 'Cozinha', 'Air fryer forno', 'A queridinha das cozinhas.', 600, 'airfryer'),
+    P('P13', 'Cozinha', 'Jogo de panelas cerâmicas', 'Antiaderentes e livres de PFOA.', 600, 'panelas'),
+    P('P14', 'Eletros', 'Aspirador vertical sem fio', 'Leve, prático e sempre à mão.', 600, 'aspirador'),
+    P('P15', 'Casa', 'Fechadura digital', 'Entrar em casa com senha ou digital.', 650, 'fechadura'),
+    P('P16', 'Casa', 'Assistente de voz com tela', 'Música, receitas e lembretes com um comando.', 500, 'assistente'),
+    P('P17', 'Cozinha', 'Aparelho de jantar 30 peças', 'Para receber a família e os amigos.', 450, 'jantar'),
+    P('P18', 'Cozinha', 'Panela de pressão elétrica', 'Arroz, feijão e carnes com um toque.', 450, 'panelas'),
+    P('P19', 'Casa', 'Tapete para a sala', 'Conforto e estilo para a sala.', 450, 'casa'),
+    P('P20', 'Cama & banho', 'Jogo de cama 400 fios', 'Lençóis macios, tamanho queen.', 400, 'cama', 2),
+    P('P21', 'Cozinha', 'Faqueiro inox 72 peças', 'Completo, para todas as ocasiões.', 380, 'jantar'),
+    P('P22', 'Cozinha', 'Liquidificador de alta potência', 'Para sucos, vitaminas e smoothies.', 380, 'liquidificador'),
+    P('P23', 'Cozinha', 'Kit churrasco', 'Para os encontros em casa.', 350, 'churrasco'),
+    P('P24', 'Cama & banho', 'Edredom e manta', 'Aconchego para os dias de chuva.', 350, 'cama'),
+    P('P25', 'Cozinha', 'Jogo de facas profissional', 'Afiadas e com suporte.', 300, 'churrasco'),
+    P('P26', 'Cama & banho', 'Kit de toalhas felpudas', 'Banho e rosto para o casal.', 300, 'toalha', 2),
+    P('P27', 'Casa', 'Luminária de piso', 'Luz aconchegante para a sala.', 300, 'luminaria'),
+    P('P28', 'Cozinha', 'Jogo de taças de cristal', 'Para brindarmos cada conquista.', 280, 'brinde'),
+    P('P29', 'Cozinha', 'Mixer 3 em 1', 'Prático para o dia a dia.', 280, 'liquidificador'),
+    P('P30', 'Cama & banho', 'Travesseiros de pluma (par)', 'Sono macio para os dois.', 280, 'cama'),
+    P('P31', 'Eletros', 'Ferro a vapor vertical', 'Roupas sem amassados em minutos.', 280, 'ferro'),
+    P('P32', 'Cozinha', 'Potes herméticos de vidro', 'Cozinha organizada e bonita.', 260, 'pote'),
+    P('P33', 'Casa', 'Plantas e vasos', 'Um toque de verde na casa nova.', 260, 'planta', 2),
+    P('P34', 'Cozinha', 'Jogo de copos', 'Para servir com charme.', 250, 'brinde'),
+    P('P35', 'Cozinha', 'Sanduicheira e grill', 'Lanches rápidos e gostosos.', 250, 'panelas'),
+    P('P36', 'Casa', 'Cestos organizadores', 'Tudo no lugar desde o primeiro dia.', 250, 'casa'),
+    P('P37', 'Contribuição', 'Contribuição livre', 'Escolha o valor que desejar.', 0, 'coracao', 0)
+  ];  const LIMITE_DIVIDIR_DEMO = 1500;
 
   /* ---------- Convites de exemplo (modo demonstração) ---------- */
   const CONVITES_EXEMPLO = [

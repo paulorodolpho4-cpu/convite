@@ -360,3 +360,7 @@ form { text-align: left; }
 .tag-dividir { display: inline-flex; align-items: center; gap: 6px; margin: -4px 0 12px; font-family: var(--sans); font-size: 9.5px; letter-spacing: .12em; text-transform: uppercase; color: var(--tinta-2); }
 .tag-dividir .icone { width: 16px; height: 16px; }
 #opcoes-dividir .opcao { font-size: 17px; }
+/* ---------- Aviso de traje e frase da lista de presentes ---------- */
+.aviso-traje { margin: 30px 6px 0; padding: 18px 16px; border-top: 1px solid var(--linha); border-bottom: 1px solid var(--linha); font-style: italic; font-size: 18px; line-height: 1.5; }
+.aviso-traje .rotulo { display: block; font-style: normal; margin-bottom: 6px; }
+.se-quiser { margin: 6px 0 0; font-family: var(--script); font-size: 46px; line-height: 1.1; color: var(--tinta); }

@@ -42,6 +42,7 @@ window.CONVITE = {
   // Avisos
   confirmarAte: "17 de novembro de 2026",
   traje: "Esporte fino",
+  avisoTraje: "Para o nosso grande dia, pedimos que evitem os tons de marrom e as tonalidades muito claras próximas ao branco.",
 
   // Música de fundo (ID do vídeo no YouTube: youtube.com/watch?v=ESTE_ID)
   musicaYoutube: "o-jWu3sdCok",
