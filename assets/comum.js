@@ -130,42 +130,54 @@
     toque: '<path d="M19 27V12a3 3 0 0 1 6 0v11"/><path d="M25 21a3 3 0 0 1 6 0v3M31 23a3 3 0 0 1 6 0v8c0 7-5 12-11 12h-2c-4 0-7-2-9-5l-6-9a3 3 0 0 1 5-3l2 3"/><path d="M13 9a10 10 0 0 1 18 0"/>',
     musica: '<path d="M18 36V10l20-4v26"/><circle cx="13" cy="36" r="5"/><circle cx="33" cy="32" r="5"/>',
     mudo: '<path d="M18 36V10l20-4v26"/><circle cx="13" cy="36" r="5"/><circle cx="33" cy="32" r="5"/><path d="M6 6l36 36"/>',
-    whatsapp: '<path d="M24 6a18 18 0 0 0-15.6 27L6 42l9.3-2.4A18 18 0 1 0 24 6z"/><path d="M17 16.5c-.8 7.5 6.8 15.2 14.4 14.5l1.6-3.5-4.2-2-2 2c-2.8-1-5-3.2-6-6l2-2-2-4.2z"/>'
+    whatsapp: '<path d="M24 6a18 18 0 0 0-15.6 27L6 42l9.3-2.4A18 18 0 1 0 24 6z"/><path d="M17 16.5c-.8 7.5 6.8 15.2 14.4 14.5l1.6-3.5-4.2-2-2 2c-2.8-1-5-3.2-6-6l2-2-2-4.2z"/>',
+    batedeira: '<path d="M8 41h32M12 41V13a5 5 0 0 1 5-5h13a8 8 0 0 1 8 8v2H12"/><path d="M18 26h20a8 8 0 0 1-8 8h-4a8 8 0 0 1-8-8zM28 18v8"/>',
+    liquidificador: '<path d="M15 7h18l-3 23H18z"/><path d="M14 30h20l2 11H12zM33 11h4v10h-5M21 36h6"/>',
+    churrasco: '<path d="M8 20h32a16 16 0 0 1-32 0z"/><path d="M15 33l-4 9M33 33l4 9M24 36v6M18 6c-2 3 2 5 0 8M24 6c-2 3 2 5 0 8M30 6c-2 3 2 5 0 8"/>',
+    gota: '<path d="M24 6s-12 14-12 22a12 12 0 0 0 24 0C36 20 24 6 24 6z"/><path d="M18 29a6 6 0 0 0 6 6"/>',
+    ar: '<rect x="5" y="9" width="38" height="17" rx="3"/><path d="M10 21h28M14 32c0 3 3 3 3 6M24 32c0 3 3 3 3 6M34 32c0 3-3 3-3 6"/>',
+    assistente: '<rect x="8" y="9" width="32" height="23" rx="4"/><path d="M15 39h18M24 32v7"/><circle cx="24" cy="20.5" r="5"/>',
+    fechadura: '<rect x="14" y="5" width="20" height="38" rx="4"/><path d="M19 12h10v12H19z"/><circle cx="24" cy="33" r="3"/>',
+    toalha: '<path d="M9 8h30v6H9zM12 14v26h24V14M12 31h24M12 35h24"/>',
+    aspirador: '<path d="M31 5l-8 31M23 36h-9a4 4 0 0 0 0 8h12a4 4 0 0 0 0-8M27 5h8"/>',
+    dividir: '<circle cx="17" cy="16" r="6"/><circle cx="33" cy="16" r="6"/><path d="M5 40c0-7 5-12 12-12s12 5 12 12M23 31c2-2 6-3 10-3 7 0 12 5 12 12"/>'
   };
   function icone(nome, classe = 'icone') {
     return `<svg class="${classe}" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ICONES[nome] || ICONES.presente}</svg>`;
   }
 
   /* ---------- Lista de presentes usada no modo demonstração ---------- */
-  const CAT = { P01: 'Lua de mel', P02: 'Lua de mel', P03: 'Lua de mel', P04: 'Lua de mel', P05: 'Lua de mel', P06: 'Lua de mel', P07: 'Casa', P08: 'Casa', P09: 'Casa', P10: 'Casa', P11: 'Cozinha', P12: 'Cozinha', P13: 'Cozinha', P14: 'Cozinha', P15: 'Cozinha', P16: 'Casa', P17: 'Casa', P18: 'Divertidos', P19: 'Experiências', P20: 'Casa', P21: 'Experiências', P22: 'Experiências', P23: 'Festa', P24: 'Casa', P25: 'Festa' };
-  const P = (codigo, nome, descricao, valor, imagem, quantidade) => ({ codigo, categoria: CAT[codigo], nome, descricao, valor, imagem: 'icone:' + imagem, linkCartao: '', quantidade });
+  const P = (codigo, categoria, nome, descricao, valor, imagem, quantidade = 1) => ({ codigo, categoria, nome, descricao, valor, imagem: 'icone:' + imagem, linkCartao: '', linkCartaoMetade: '', quantidade });
   const PRESENTES_EXEMPLO = [
-    P('P01', 'Passagens da lua de mel', 'Uma cota para voarmos rumo ao destino dos sonhos.', 1500, 'viagem', 6),
-    P('P02', 'Diárias do hotel na lua de mel', 'Uma noite inesquecível por cota.', 900, 'cama', 5),
-    P('P03', 'Jantar romântico à beira-mar', 'Uma noite especial a dois na lua de mel.', 450, 'jantar', 3),
-    P('P04', 'Passeio de barco na lua de mel', 'Sol, mar e muitas fotos.', 600, 'barco', 2),
-    P('P05', 'Day spa para os noivos', 'Descanso merecido depois da festa.', 500, 'spa', 1),
-    P('P06', 'Malas de viagem para nós dois', 'Prontos para muitas aventuras juntos.', 700, 'mala', 1),
-    P('P07', 'Smart TV para as noites de filme', 'Uma cota da TV da sala.', 800, 'tv', 4),
-    P('P08', 'Sofá do nosso primeiro lar', 'Uma cota do sofá mais aconchegante.', 900, 'sofa', 4),
-    P('P09', 'Geladeira', 'Uma cota da geladeira da casa nova.', 1000, 'geladeira', 4),
-    P('P10', 'Máquina de lavar', 'Uma cota para a lavanderia.', 900, 'lavar', 3),
-    P('P11', 'Jogo de panelas profissional', 'Para os almoços de domingo em família.', 650, 'panelas', 1),
-    P('P12', 'Cafeteira espresso', 'Para começar bem todas as manhãs.', 800, 'cafe', 1),
-    P('P13', 'Air fryer', 'Praticidade na cozinha do dia a dia.', 450, 'airfryer', 1),
-    P('P14', 'Aparelho de jantar completo', 'Para receber a família e os amigos.', 550, 'jantar', 1),
-    P('P15', 'Jogo de taças de cristal', 'Para brindarmos cada conquista.', 380, 'brinde', 1),
-    P('P16', 'Enxoval de cama, mesa e banho', 'Aconchego para o novo lar.', 750, 'cama', 1),
-    P('P17', 'Robô aspirador', 'Porque tempo juntos vale mais que faxina.', 1200, 'robo', 1),
-    P('P18', 'Kit de ferramentas de engenheiro', 'Afinal, somos engenheiros!', 400, 'capacete', 1),
-    P('P19', 'Bicicletas para passear juntos', 'Uma cota para pedalarmos pela orla.', 1100, 'bike', 2),
-    P('P20', 'Plantas e vasos para a varanda', 'Um toque de verde na casa nova.', 300, 'planta', 2),
-    P('P21', 'Curso de culinária a dois', 'Aprender a cozinhar juntos.', 480, 'chef', 1),
-    P('P22', 'Ensaio do 1º aniversário de casamento', 'Para registrar nosso primeiro ano.', 900, 'foto', 1),
-    P('P23', 'Ajuda com a festa', 'Uma cota para o buffet e a celebração.', 500, 'brinde', 10),
-    P('P24', 'Casa própria', 'Uma cota para a entrada do nosso lar.', 1000, 'casa', 10),
-    P('P25', 'Contribuição livre', 'Escolha o valor que desejar (a partir de R$ 300).', 0, 'coracao', 0)
+    P('P01', 'Cozinha', 'Air fryer forno 12 litros', 'A queridinha das cozinhas: assa, gratina e frita sem óleo.', 650, 'airfryer'),
+    P('P02', 'Cozinha', 'Cafeteira Nespresso Vertuo', 'Com kit de cápsulas para o café da manhã a dois.', 900, 'cafe'),
+    P('P03', 'Cozinha', 'Batedeira planetária', 'Estilo KitchenAid, para bolos e receitas de domingo.', 2800, 'batedeira'),
+    P('P04', 'Cozinha', 'Jogo de panelas cerâmicas', 'Antiaderentes, coloridas e livres de PFOA.', 900, 'panelas'),
+    P('P05', 'Cozinha', 'Panela de pressão elétrica', 'Multifuncional: arroz, feijão e carnes com um toque.', 550, 'panelas'),
+    P('P06', 'Cozinha', 'Liquidificador de alta potência', 'Para sucos, vitaminas e smoothies.', 450, 'liquidificador'),
+    P('P07', 'Cozinha', 'Aparelho de jantar 30 peças', 'Para receber a família e os amigos.', 650, 'jantar'),
+    P('P08', 'Cozinha', 'Faqueiro inox 72 peças', 'Completo, para todas as ocasiões.', 500, 'jantar'),
+    P('P09', 'Cozinha', 'Jogo de taças de cristal', 'Para brindarmos cada conquista.', 380, 'brinde'),
+    P('P10', 'Cozinha', 'Kit churrasco premium', 'Facas, tábua e acessórios para os encontros em casa.', 400, 'churrasco'),
+    P('P11', 'Eletros', 'Geladeira frost free inverse', 'Freezer embaixo e muito espaço para a casa nova.', 4500, 'geladeira'),
+    P('P12', 'Eletros', 'Lava e seca', 'Roupa limpa e seca sem varal.', 3800, 'lavar'),
+    P('P13', 'Eletros', 'Lava-louças', 'Porque a louça não vai se lavar sozinha… ou vai!', 2900, 'lavar'),
+    P('P14', 'Eletros', 'Robô aspirador e passa pano', 'Tempo juntos vale mais que faxina.', 1900, 'robo'),
+    P('P15', 'Eletros', 'Ar-condicionado split inverter', 'Noites fresquinhas no calor de Natal.', 2600, 'ar'),
+    P('P16', 'Eletros', 'Purificador de água', 'Água gelada e filtrada direto na cozinha.', 900, 'gota'),
+    P('P17', 'Eletros', 'Aspirador vertical sem fio', 'Leve, prático e sempre à mão.', 800, 'aspirador'),
+    P('P18', 'Casa', 'Smart TV 55" 4K', 'Para as noites de filme e série.', 3200, 'tv'),
+    P('P19', 'Casa', 'Sofá retrátil', 'O cantinho mais aconchegante do primeiro lar.', 3500, 'sofa'),
+    P('P20', 'Casa', 'Assistente de voz com tela', 'Música, receitas e lembretes com um comando.', 700, 'assistente'),
+    P('P21', 'Casa', 'Fechadura digital', 'Entrar em casa com senha ou digital.', 900, 'fechadura'),
+    P('P22', 'Casa', 'Plantas e vasos para a varanda', 'Um toque de verde na casa nova.', 300, 'planta', 2),
+    P('P23', 'Cama & banho', 'Colchão e base box casal', 'Noites de sono perfeitas.', 3000, 'cama'),
+    P('P24', 'Cama & banho', 'Jogo de cama 400 fios', 'Lençóis macios, tamanho queen.', 450, 'cama'),
+    P('P25', 'Cama & banho', 'Kit de toalhas felpudas', 'Banho e rosto, para o casal e as visitas.', 350, 'toalha'),
+    P('P26', 'Cama & banho', 'Edredom e manta', 'Aconchego para os dias de chuva.', 380, 'cama'),
+    P('P27', 'Contribuição', 'Contribuição livre', 'Escolha o valor que desejar.', 0, 'coracao', 0)
   ];
+  const LIMITE_DIVIDIR_DEMO = 1500;
 
   /* ---------- Convites de exemplo (modo demonstração) ---------- */
   const CONVITES_EXEMPLO = [
@@ -227,19 +239,24 @@
       return {
         ok: true,
         valorMinimo: C.valorMinimo,
+        limiteDividir: LIMITE_DIVIDIR_DEMO,
         pix: { chave: '00000000000', nome: `${C.noivos.ela} e ${C.noivos.ele}`, cidade: 'Natal' },
-        presentes: PRESENTES_EXEMPLO.map((p) => ({ ...p, recebidos: db.presentes.filter((x) => x.codigo === p.codigo).length }))
+        presentes: PRESENTES_EXEMPLO.map((p) => ({ ...p, recebidos: db.presentes.filter((x) => x.codigo === p.codigo).reduce((s, x) => s + (x.fracao || 1), 0) }))
       };
     },
     presente(d) {
       const db = lerDemo();
-      const p = PRESENTES_EXEMPLO.find((x) => x.codigo === d.codigo);
+      const p = demo.presentes().presentes.find((x) => x.codigo === d.codigo);
       if (!p) return { ok: false, erro: 'Este presente não está mais disponível.' };
+      const restante = p.quantidade > 0 ? p.quantidade - p.recebidos : Infinity;
+      if (restante <= 0) return { ok: false, erro: 'Este presente já foi escolhido por outro convidado.' };
+      const dividir = p.valor > LIMITE_DIVIDIR_DEMO && (d.dividir || restante < 1);
       if (!(p.valor > 0) && !(Number(d.valor) >= C.valorMinimo)) return { ok: false, erro: `O valor mínimo é ${reais(C.valorMinimo)}.` };
+      const valor = p.valor > 0 ? (dividir ? Math.round(p.valor * 50) / 100 : p.valor) : Number(d.valor);
       const protocolo = 'PR' + novoCodigo(6);
-      db.presentes.push({ ...d, protocolo, data: new Date().toISOString() });
+      db.presentes.push({ ...d, valor, fracao: dividir ? 0.5 : 1, protocolo, data: new Date().toISOString() });
       salvarDemo(db);
-      return { ok: true, protocolo };
+      return { ok: true, protocolo, valor, dividido: dividir };
     },
     checkin(d) {
       if (d.senha !== SENHA_DEMO) return { ok: false, erro: 'Senha incorreta.' };

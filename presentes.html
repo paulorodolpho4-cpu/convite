@@ -10,10 +10,10 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400;1,500&family=Jost:wght@300;400;500&family=Mrs+Saint+Delafield&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="assets/estilo.css?v=202610121929">
-  <script src="assets/config.js?v=202610121929"></script>
+  <link rel="stylesheet" href="assets/estilo.css?v=202610122223">
+  <script src="assets/config.js?v=202610122223"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js"></script>
-  <script src="assets/comum.js?v=202610121929"></script>
+  <script src="assets/comum.js?v=202610122223"></script>
 </head>
 <body>
 <main class="pagina">
@@ -55,6 +55,15 @@
       <h2 class="titulo-italico" id="pres-titulo"></h2>
       <div class="resumo-presente"><p class="valor" id="pres-valor"></p></div>
       <form id="form-presente" novalidate>
+        <p class="aviso-convite" id="aviso-metade" hidden></p>
+        <fieldset class="opcoes" id="opcoes-dividir" hidden>
+          <legend>Como você quer presentear?</legend>
+          <label class="opcao"><input type="radio" name="modo" value="inteiro" checked><span class="marca"></span><span id="txt-inteiro"></span></label>
+          <label class="opcao"><input type="radio" name="modo" value="metade"><span class="marca"></span><span id="txt-metade"></span></label>
+        </fieldset>
+        <label class="campo" id="campo-dividir" hidden><span>Com quem você vai dividir? (opcional)</span>
+          <input name="dividirCom" autocomplete="off" placeholder="Nome da outra pessoa">
+        </label>
         <label class="campo" id="campo-livre" hidden><span id="rotulo-livre">Valor do presente (R$)</span>
           <input name="valor" type="text" inputmode="decimal" placeholder="Ex.: 500,00">
         </label>
@@ -79,6 +88,7 @@
       <textarea class="copia-cola" id="pix-codigo" readonly aria-label="Código Pix copia e cola"></textarea>
       <div class="pilha">
         <button class="botao" type="button" id="pix-copiar">Copiar código Pix</button>
+        <a class="botao-sec chamar-dividir" target="_blank" rel="noopener" hidden></a>
         <button class="botao-sec" type="button" data-fechar>Concluir</button>
       </div>
       <p class="nota">Presente registrado (protocolo <span id="pix-protocolo"></span>). Os noivos conferem o recebimento no extrato. Muito obrigado!</p>
@@ -90,6 +100,7 @@
       <p class="introducao">Presente registrado (protocolo <span id="cartao-protocolo"></span>). Toque abaixo para pagar em ambiente seguro, parcelando conforme a operadora.</p>
       <div class="pilha">
         <a class="botao" id="cartao-link" target="_blank" rel="noopener">Ir para o pagamento</a>
+        <a class="botao-sec chamar-dividir" target="_blank" rel="noopener" hidden></a>
         <button class="botao-sec" type="button" data-fechar>Concluir</button>
       </div>
     </div>
@@ -142,22 +153,29 @@
   function desenharLista() {
     const itens = dados.presentes.map((p, i) => ({ p, i })).filter(({ p }) => filtro === 'Todos' || p.categoria === filtro);
     lista.innerHTML = itens.map(({ p, i }) => {
-      const esgotado = p.quantidade > 0 && p.recebidos >= p.quantidade;
-      const restam = p.quantidade > 1 && !esgotado ? `<p class="cotas">${p.quantidade - p.recebidos} de ${p.quantidade} cotas disponíveis</p>` : '';
+      const restante = restanteDe(p), esgotado = restante <= 0;
+      const metade = !esgotado && restante < 1;
+      let info = '';
+      if (metade) info = `<p class="cotas destaque">Falta metade · ${U.reais(p.valor / 2)}</p>`;
+      else if (!esgotado && p.quantidade > 1) info = `<p class="cotas">${restante} de ${p.quantidade} disponíveis</p>`;
+      if (!esgotado && !metade && podeDividir(p)) info += `<p class="tag-dividir">${U.icone('dividir')}Pode ser dividido entre 2 pessoas</p>`;
       return `<article class="presente revelar${esgotado ? ' esgotado' : ''}">
         <div class="imagem">${imagem(p.imagem)}</div>
         <h3>${esc(p.nome)}</h3>
         <p class="desc">${esc(p.descricao)}</p>
-        <p class="preco">${p.valor > 0 ? U.reais(p.valor) + (p.quantidade > 1 ? ' <small>/ cota</small>' : '') : 'A partir de ' + U.reais(dados.valorMinimo)}</p>${restam}
-        <button class="botao" type="button" data-i="${i}" ${esgotado ? 'disabled' : ''}>${esgotado ? 'Presenteado ♡' : 'Presentear'}</button>
+        <p class="preco">${p.valor > 0 ? U.reais(p.valor) : 'A partir de ' + U.reais(dados.valorMinimo)}</p>${info}
+        <button class="botao" type="button" data-i="${i}" ${esgotado ? 'disabled' : ''}>${esgotado ? 'Presenteado ♡' : metade ? 'Completar presente' : 'Presentear'}</button>
       </article>`;
     }).join('');
     U.animarAoRolar();
   }
+  const restanteDe = (p) => (p.quantidade > 0 ? Math.round((p.quantidade - p.recebidos) * 10) / 10 : Infinity);
+  const podeDividir = (p) => p.valor > 0 && p.valor > dados.limiteDividir;
   async function carregar() {
     try {
       dados = await U.api('presentes');
       dados.valorMinimo = Number(dados.valorMinimo) || C.valorMinimo || 0;
+      dados.limiteDividir = dados.limiteDividir === undefined ? 1500 : Number(dados.limiteDividir);
       if (!dados.presentes.length) { lista.innerHTML = '<p class="carregando">A lista de presentes será publicada em breve.</p>'; return; }
       desenharFiltros();
       desenharLista();
@@ -177,19 +195,41 @@
     dlg.scrollTop = 0;
   }
 
+  /* ----- Janela do presente (com opção de dividir acima do limite) ----- */
+  let soMetade = false;
+  const dividindo = () => soMetade || (podeDividir(atual) && form.modo.value === 'metade');
+  function atualizarModo() {
+    const metade = dividindo();
+    $('pres-valor').textContent = atual.valor > 0 ? U.reais(metade ? atual.valor / 2 : atual.valor) + (metade ? ' (metade)' : '') : 'Valor livre';
+    $('campo-dividir').hidden = !(metade && !soMetade);
+    $('forma-cartao').style.display = (metade ? atual.linkCartaoMetade : atual.linkCartao) ? '' : 'none';
+    if ($('forma-cartao').style.display === 'none') form.forma.value = 'Pix';
+  }
+  form.querySelectorAll('input[name=modo]').forEach((r) => r.addEventListener('change', atualizarModo));
+
+  function abrirPresente(p) {
+    atual = p;
+    const restante = restanteDe(p);
+    soMetade = podeDividir(p) && restante < 1;
+    $('pres-titulo').textContent = p.nome;
+    $('campo-livre').hidden = p.valor > 0;
+    $('rotulo-livre').textContent = `Valor do presente (mínimo ${U.reais(dados.valorMinimo)})`;
+    $('opcoes-dividir').hidden = !(podeDividir(p) && !soMetade);
+    $('txt-inteiro').textContent = `Presentear sozinho · ${U.reais(p.valor)}`;
+    $('txt-metade').textContent = `Dividir com outra pessoa · ${U.reais(p.valor / 2)} cada`;
+    $('aviso-metade').hidden = !soMetade;
+    $('aviso-metade').innerHTML = soMetade ? `Alguém já presenteou <strong>metade</strong> deste item. Complete a outra metade com <strong>${U.reais(p.valor / 2)}</strong>.` : '';
+    form.modo.value = 'inteiro';
+    form.forma.value = 'Pix';
+    erro.textContent = '';
+    atualizarModo();
+    mostrar('pres-passo1');
+    if (!dlg.open) dlg.showModal();
+  }
   lista.addEventListener('click', (e) => {
     const b = e.target.closest('button[data-i]');
     if (!b || b.disabled) return;
-    atual = dados.presentes[+b.dataset.i];
-    $('pres-titulo').textContent = atual.nome;
-    $('pres-valor').textContent = atual.valor > 0 ? U.reais(atual.valor) : 'Valor livre';
-    $('campo-livre').hidden = atual.valor > 0;
-    $('rotulo-livre').textContent = `Valor do presente (mínimo ${U.reais(dados.valorMinimo)})`;
-    $('forma-cartao').style.display = atual.linkCartao ? '' : 'none';
-    form.forma.value = 'Pix';
-    erro.textContent = '';
-    mostrar('pres-passo1');
-    dlg.showModal();
+    abrirPresente(dados.presentes[+b.dataset.i]);
   });
 
   form.addEventListener('submit', async (e) => {
@@ -206,19 +246,30 @@
     if (nome.split(' ').length < 2) { erro.textContent = 'Informe seu nome completo.'; form.nome.focus(); return; }
     if (celular.length < 10 || celular.length > 11) { erro.textContent = 'Informe um celular válido com DDD.'; form.celular.focus(); return; }
 
+    const dividir = dividindo();
+    if (dividir) valor = Math.round(atual.valor * 50) / 100;
     const botao = form.querySelector('button[type=submit]');
     botao.disabled = true; botao.textContent = 'Registrando…';
     try {
-      const r = await U.api('presente', { codigo: atual.codigo, valor, forma, nome, celular, mensagem: form.mensagem.value.trim(), convite: codigoConvite });
+      const r = await U.api('presente', { codigo: atual.codigo, valor, forma, nome, celular, mensagem: form.mensagem.value.trim(), convite: codigoConvite, dividir, dividirCom: form.dividirCom.value.trim() });
+      const pago = Number(r.valor) || valor;
+      // Quem começou a divisão pode chamar alguém pelo WhatsApp para completar a outra metade
+      const chamar = dividir && !soMetade;
+      const linkPresente = U.urlDoSite('presentes.html?p=' + encodeURIComponent(atual.codigo));
+      document.querySelectorAll('.chamar-dividir').forEach((a) => {
+        a.hidden = !chamar;
+        a.href = 'https://wa.me/?text=' + encodeURIComponent(`Vamos dividir um presente para ${C.noivos.ela} & ${C.noivos.ele}? 💛\n${atual.nome}: eu já fiz a minha metade (${U.reais(pago)}). Complete a outra metade aqui:\n${linkPresente}`);
+        a.innerHTML = U.icone('whatsapp') + 'Chamar alguém para dividir';
+      });
       if (forma === 'Pix') {
-        const pix = U.pixCopiaECola({ ...dados.pix, valor, txid: r.protocolo });
+        const pix = U.pixCopiaECola({ ...dados.pix, valor: pago, txid: r.protocolo });
         $('pix-qr').innerHTML = U.qrSvg(pix);
         $('pix-codigo').value = pix;
-        $('pix-valor').textContent = U.reais(valor);
+        $('pix-valor').textContent = U.reais(pago) + (dividir ? ' · sua metade' : '');
         $('pix-protocolo').textContent = r.protocolo;
         mostrar('pres-pix');
       } else {
-        $('cartao-link').href = atual.linkCartao;
+        $('cartao-link').href = r.linkCartao || (dividir ? atual.linkCartaoMetade : atual.linkCartao);
         $('cartao-protocolo').textContent = r.protocolo;
         mostrar('pres-cartao');
       }
@@ -233,7 +284,12 @@
 
   $('pix-copiar').addEventListener('click', (e) => U.copiar($('pix-codigo').value, e.currentTarget));
   mostrarConfirmacao();
-  carregar();
+  // Link "?p=P03" (enviado por quem começou a dividir) abre direto o presente
+  const presenteDoLink = new URLSearchParams(location.search).get('p');
+  carregar().then(() => {
+    const p = presenteDoLink && dados && dados.presentes.find((x) => x.codigo === presenteDoLink.toUpperCase());
+    if (p && restanteDe(p) > 0) abrirPresente(p);
+  });
 })();
 </script>
 </body>
