@@ -10,10 +10,10 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400;1,500&family=Jost:wght@300;400;500&family=Mrs+Saint+Delafield&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="assets/estilo.css?v=202610122256">
-  <script src="assets/config.js?v=202610122256"></script>
+  <link rel="stylesheet" href="assets/estilo.css?v=202610122313">
+  <script src="assets/config.js?v=202610122313"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js"></script>
-  <script src="assets/comum.js?v=202610122256"></script>
+  <script src="assets/comum.js?v=202610122313"></script>
 </head>
 <body>
 <main class="pagina">
@@ -54,6 +54,7 @@
     <div id="pres-passo1">
       <p class="rotulo">Presentear</p>
       <h2 class="titulo-italico" id="pres-titulo"></h2>
+      <div class="foto-presente" id="pres-foto" hidden></div>
       <div class="resumo-presente"><p class="valor" id="pres-valor"></p></div>
       <form id="form-presente" novalidate>
         <p class="aviso-convite" id="aviso-metade" hidden></p>
@@ -120,7 +121,8 @@
 
   let dados = null, atual = null, filtro = 'Todos';
   const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
-  const imagem = (img) => /^https?:\/\//i.test(img || '')
+  const temFoto = (img) => /^https?:\/\//i.test(img || '');
+  const imagem = (img) => temFoto(img)
     ? `<img src="${esc(img)}" alt="" loading="lazy">`
     : U.icone(String(img || '').replace(/^icone:/, '') || 'presente');
 
@@ -160,7 +162,7 @@
       if (metade) info = `<p class="cotas destaque">Falta metade · ${U.reais(p.valor / 2)}</p>`;
       else if (!esgotado && p.quantidade > 1) info = `<p class="cotas">${restante} de ${p.quantidade} disponíveis</p>`;
       if (!esgotado && !metade && podeDividir(p)) info += `<p class="tag-dividir">${U.icone('dividir')}Pode ser dividido entre 2 pessoas</p>`;
-      return `<article class="presente revelar${esgotado ? ' esgotado' : ''}">
+      return `<article class="presente revelar${temFoto(p.imagem) ? ' com-foto' : ''}${esgotado ? ' esgotado' : ''}">
         <div class="imagem">${imagem(p.imagem)}</div>
         <h3>${esc(p.nome)}</h3>
         <p class="desc">${esc(p.descricao)}</p>
@@ -213,6 +215,8 @@
     const restante = restanteDe(p);
     soMetade = podeDividir(p) && restante < 1;
     $('pres-titulo').textContent = p.nome;
+    $('pres-foto').hidden = !temFoto(p.imagem);
+    $('pres-foto').innerHTML = temFoto(p.imagem) ? imagem(p.imagem) : '';
     $('campo-livre').hidden = p.valor > 0;
     $('rotulo-livre').textContent = `Valor do presente (mínimo ${U.reais(dados.valorMinimo)})`;
     $('opcoes-dividir').hidden = !(podeDividir(p) && !soMetade);

@@ -49,7 +49,7 @@ window.CONVITE = {
   musicaTitulo: "Diga Sim pra Mim · Dueto Enamorados",
 
   // Valor mínimo de um presente na lista (R$)
-  valorMinimo: 250,
+  valorMinimo: 180,
 
   // Endereço público do site (GitHub Pages), com barra no final.
   siteUrl: "https://paulorodolpho4-cpu.github.io/convite/",
