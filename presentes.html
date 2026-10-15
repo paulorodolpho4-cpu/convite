@@ -10,10 +10,10 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400;1,500&family=Jost:wght@300;400;500&family=Mrs+Saint+Delafield&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="assets/estilo.css?v=202610142321">
-  <script src="assets/config.js?v=202610142321"></script>
+  <link rel="stylesheet" href="assets/estilo.css?v=202610142324">
+  <script src="assets/config.js?v=202610142324"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js"></script>
-  <script src="assets/comum.js?v=202610142321"></script>
+  <script src="assets/comum.js?v=202610142324"></script>
 </head>
 <body>
 <main class="pagina">
@@ -190,7 +190,10 @@
   const podeDividir = (p) => p.valor > 0 && p.valor > dados.limiteDividir;
   async function carregar() {
     try {
-      dados = await U.api('presentes');
+      // Tenta de novo se a planilha demorar a responder (ex.: primeira consulta do dia)
+      for (let tentativa = 1; ; tentativa++) {
+        try { dados = await U.api('presentes'); break; } catch (e) { if (tentativa >= 3) throw e; await new Promise((r) => setTimeout(r, 1500 * tentativa)); }
+      }
       dados.valorMinimo = Number(dados.valorMinimo) || C.valorMinimo || 0;
       dados.limiteDividir = dados.limiteDividir === undefined ? 1500 : Number(dados.limiteDividir);
       if (!dados.presentes.length) { lista.innerHTML = '<p class="carregando">A lista de presentes será publicada em breve.</p>'; return; }
