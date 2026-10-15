@@ -13,9 +13,9 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400;1,500&family=Jost:wght@300;400;500&family=Mrs+Saint+Delafield&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="assets/estilo.css?v=202610142237">
-  <script src="assets/config.js?v=202610142237"></script>
-  <script src="assets/comum.js?v=202610142237"></script>
+  <link rel="stylesheet" href="assets/estilo.css?v=202610142321">
+  <script src="assets/config.js?v=202610142321"></script>
+  <script src="assets/comum.js?v=202610142321"></script>
 </head>
 <body class="travado">
 
@@ -159,6 +159,8 @@
 
 <button class="musica" type="button" id="musica" aria-label="Pausar música" hidden></button>
 <div id="player-musica" aria-hidden="true"></div>
+<!-- Lista de presentes aberta por cima do convite, para a música não parar -->
+<div class="tela-presentes" id="tela-presentes" hidden><iframe id="frame-presentes" title="Lista de presentes"></iframe></div>
 
 <!-- Painel de confirmação de presença -->
 <dialog class="painel" id="rsvp" aria-labelledby="rsvp-titulo">
@@ -306,6 +308,31 @@
     if (!player || !prontoPlayer) return;
     if (player.getPlayerState() === YT.PlayerState.PLAYING) player.pauseVideo(); else player.playVideo();
   });
+  // Guarda o ponto da música, para a lista de presentes continuar dali se for aberta pelo link direto
+  setInterval(() => { if (player && prontoPlayer) U.salvarTempoMusica(player); }, 3000);
+
+  /* ----- Lista de presentes por cima do convite (a música continua tocando) ----- */
+  const telaPresentes = $('tela-presentes'), framePresentes = $('frame-presentes');
+  function abrirPresentes(url) {
+    framePresentes.src = url + (url.includes('?') ? '&' : '?') + 'embed=1';
+    telaPresentes.hidden = false;
+    document.body.classList.add('travado');
+    history.pushState({ presentes: true }, '');
+  }
+  function fecharPresentes() {
+    telaPresentes.hidden = true;
+    framePresentes.src = 'about:blank';
+    document.body.classList.remove('travado');
+  }
+  window.addEventListener('popstate', () => { if (!telaPresentes.hidden) fecharPresentes(); });
+  window.addEventListener('message', (e) => {
+    if (e.origin === location.origin && e.data === 'fechar-presentes' && !telaPresentes.hidden) history.back();
+  });
+  ['link-presentes', 'recusa-presentes'].forEach((id) => $(id).addEventListener('click', (e) => {
+    e.preventDefault();
+    if (dialogo.open) dialogo.close();
+    abrirPresentes($(id).getAttribute('href'));
+  }));
 
   /* ----- Confirmação de presença ----- */
   const form = $('form-rsvp');
@@ -374,8 +401,9 @@
       convite.pessoas = r.pessoas;
       if (resposta !== 'Confirmado') { mostrar('rsvp-recusa'); return; }
       try { localStorage.setItem('convite-celular', celular); } catch (x) {}
-      // Após confirmar, o convidado segue para a lista de presentes, onde vê os QR Codes
-      location.href = 'presentes.html?c=' + encodeURIComponent(convite.codigo) + '&confirmado=1';
+      // Após confirmar, o convidado segue para a lista de presentes (com a música tocando), onde vê os QR Codes
+      dialogo.close();
+      abrirPresentes('presentes.html?c=' + encodeURIComponent(convite.codigo) + '&confirmado=1');
     } catch (err) {
       erro.textContent = err.message || 'Não foi possível enviar. Verifique sua conexão e tente novamente.';
     } finally {

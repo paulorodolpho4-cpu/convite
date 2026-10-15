@@ -363,9 +363,57 @@
     else { const ta = document.createElement('textarea'); ta.value = texto; document.body.appendChild(ta); ta.select(); document.execCommand('copy'); ta.remove(); ok(); }
   }
 
+  /* ---------- Música de fundo (YouTube) quando a página é aberta direto pelo link ---------- */
+  // Continua de onde parou no convite; se o navegador bloquear o som automático, começa no primeiro toque.
+  function salvarTempoMusica(player) {
+    try { if (player.getPlayerState() === YT.PlayerState.PLAYING) localStorage.setItem('musica-tempo', String(Math.floor(player.getCurrentTime()))); } catch (x) {}
+  }
+  function musicaDeFundo() {
+    if (!C.musicaYoutube) return;
+    const botao = document.createElement('button');
+    botao.className = 'musica'; botao.type = 'button';
+    const alvo = document.createElement('div');
+    alvo.setAttribute('aria-hidden', 'true');
+    document.body.append(botao, alvo);
+    let player = null, pronto = false;
+    const marcar = (tocando) => {
+      botao.innerHTML = icone(tocando ? 'musica' : 'mudo');
+      botao.classList.toggle('tocando', tocando);
+      botao.setAttribute('aria-label', tocando ? 'Pausar música' : 'Tocar música');
+    };
+    marcar(false);
+    window.onYouTubeIframeAPIReady = () => {
+      let inicio = 0;
+      try { inicio = Number(localStorage.getItem('musica-tempo')) || 0; } catch (x) {}
+      player = new YT.Player(alvo, {
+        width: 1, height: 1, videoId: C.musicaYoutube,
+        playerVars: { autoplay: 1, controls: 0, loop: 1, playlist: C.musicaYoutube, playsinline: 1, rel: 0, start: inicio },
+        events: {
+          onReady: () => { pronto = true; player.setVolume(70); player.playVideo(); },
+          onStateChange: (e) => marcar(e.data === YT.PlayerState.PLAYING || e.data === YT.PlayerState.BUFFERING)
+        }
+      });
+      setInterval(() => pronto && salvarTempoMusica(player), 3000);
+    };
+    const s = document.createElement('script');
+    s.src = 'https://www.youtube.com/iframe_api';
+    document.head.appendChild(s);
+    const primeiroToque = (e) => {
+      if (botao.contains(e.target)) return;
+      document.removeEventListener('click', primeiroToque, true);
+      if (pronto && player.getPlayerState() !== YT.PlayerState.PLAYING) player.playVideo();
+    };
+    document.addEventListener('click', primeiroToque, true);
+    botao.addEventListener('click', () => {
+      if (!pronto) return;
+      document.removeEventListener('click', primeiroToque, true);
+      if (player.getPlayerState() === YT.PlayerState.PLAYING) player.pauseVideo(); else player.playVideo();
+    });
+  }
+
   window.Convite = {
     preencher, animarAoRolar, mascaraCelular, soDigitos, reais, formatarCodigo, primeiroNome,
-    linkConvite, urlDoSite, qrSvg, pixCopiaECola, crc16, icone, api, ligarPaineis, copiar,
+    linkConvite, urlDoSite, qrSvg, pixCopiaECola, crc16, icone, api, ligarPaineis, copiar, musicaDeFundo, salvarTempoMusica,
     codigoConvite, normalizarCodigoConvite, tipoDoCodigo, iniciarContador, mensagemWhatsApp,
     modoDemo: !C.apiUrl, SENHA_DEMO, CONVITES_EXEMPLO
   };

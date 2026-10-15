@@ -10,10 +10,10 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400;1,500&family=Jost:wght@300;400;500&family=Mrs+Saint+Delafield&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="assets/estilo.css?v=202610142237">
-  <script src="assets/config.js?v=202610142237"></script>
+  <link rel="stylesheet" href="assets/estilo.css?v=202610142321">
+  <script src="assets/config.js?v=202610142321"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js"></script>
-  <script src="assets/comum.js?v=202610142237"></script>
+  <script src="assets/comum.js?v=202610142321"></script>
 </head>
 <body>
 <main class="pagina">
@@ -124,6 +124,14 @@
   U.mascaraCelular(form.celular);
   const codigoConvite = U.codigoConvite();
   if (codigoConvite) $('voltar').href = 'index.html?c=' + codigoConvite;
+
+  // Aberta por cima do convite: a música continua tocando lá; "‹ Convite" só fecha esta tela.
+  const embutida = new URLSearchParams(location.search).has('embed') && window.parent !== window;
+  if (embutida) {
+    $('voltar').addEventListener('click', (e) => { e.preventDefault(); window.parent.postMessage('fechar-presentes', location.origin); });
+  } else {
+    U.musicaDeFundo();
+  }
 
   let dados = null, atual = null, filtro = 'Todos';
   const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
