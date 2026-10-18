@@ -419,7 +419,8 @@
       let inicio = 0;
       try { inicio = Number(localStorage.getItem('musica-tempo')) || 0; } catch (x) {}
       player = new YT.Player(alvo, {
-        width: 1, height: 1, videoId: C.musicaYoutube,
+        host: 'https://www.youtube-nocookie.com', // modo de privacidade: sem anúncios antes da música
+        width: ios ? 260 : 1, height: ios ? 146 : 1, videoId: C.musicaYoutube,
         playerVars: ios
           ? { autoplay: 0, controls: 1, loop: 1, playlist: C.musicaYoutube, playsinline: 1, rel: 0, modestbranding: 1, start: inicio }
           : { autoplay: 1, mute: 1, controls: 0, loop: 1, playlist: C.musicaYoutube, playsinline: 1, rel: 0, start: inicio },

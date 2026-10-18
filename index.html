@@ -13,9 +13,9 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400;1,500&family=Jost:wght@300;400;500&family=Mrs+Saint+Delafield&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="assets/estilo.css?v=202610181810">
-  <script src="assets/config.js?v=202610181810"></script>
-  <script src="assets/comum.js?v=202610181810"></script>
+  <link rel="stylesheet" href="assets/estilo.css?v=202610181814">
+  <script src="assets/config.js?v=202610181814"></script>
+  <script src="assets/comum.js?v=202610181814"></script>
 </head>
 <body class="travado">
 
@@ -313,7 +313,8 @@
   }
   window.onYouTubeIframeAPIReady = function () {
     player = new YT.Player('player-musica', {
-      width: 1, height: 1, videoId: C.musicaYoutube,
+      host: 'https://www.youtube-nocookie.com', // modo de privacidade: sem anúncios antes da música
+        width: ios ? 260 : 1, height: ios ? 146 : 1, videoId: C.musicaYoutube,
       playerVars: ios
         ? { autoplay: 0, controls: 1, loop: 1, playlist: C.musicaYoutube, playsinline: 1, rel: 0, modestbranding: 1 }
         : { autoplay: 1, mute: 1, controls: 0, loop: 1, playlist: C.musicaYoutube, playsinline: 1, rel: 0 },
