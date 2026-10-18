@@ -86,13 +86,19 @@
     }
     return crc.toString(16).toUpperCase().padStart(4, '0');
   }
+  // O Pix aceita até 25 letras no nome: abrevia os nomes do meio (da direita para a esquerda) antes de cortar
+  function nomeCurto(n) {
+    const partes = n.split(/\s+/).filter(Boolean);
+    for (let i = partes.length - 2; i > 0 && partes.join(' ').length > 25; i--) partes[i] = partes[i].charAt(0);
+    return partes.join(' ').slice(0, 25);
+  }
   function pixCopiaECola({ chave, nome, cidade, valor }) {
     const limpa = (s) => String(s || '').normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/[^A-Za-z0-9 ]/g, '').toUpperCase().trim();
     // Mesmo formato do Pix estático gerado pelos bancos: GUI em maiúsculas e txid "***"
     // (alguns bancos recusam código estático com txid próprio; o protocolo fica só na planilha)
     let p = emv('00', '01') + emv('26', emv('00', 'BR.GOV.BCB.PIX') + emv('01', String(chave).replace(/\s/g, ''))) + emv('52', '0000') + emv('53', '986');
     if (valor > 0) p += emv('54', Number(valor).toFixed(2));
-    p += emv('58', 'BR') + emv('59', limpa(nome).slice(0, 25) || 'NOIVOS') + emv('60', limpa(cidade).slice(0, 15) || 'NATAL');
+    p += emv('58', 'BR') + emv('59', nomeCurto(limpa(nome)) || 'NOIVOS') + emv('60', limpa(cidade).slice(0, 15) || 'NATAL');
     p += emv('62', emv('05', '***'));
     p += '6304';
     return p + crc16(p);
