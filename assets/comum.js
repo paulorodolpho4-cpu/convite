@@ -86,12 +86,14 @@
     }
     return crc.toString(16).toUpperCase().padStart(4, '0');
   }
-  function pixCopiaECola({ chave, nome, cidade, valor, txid }) {
+  function pixCopiaECola({ chave, nome, cidade, valor }) {
     const limpa = (s) => String(s || '').normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/[^A-Za-z0-9 ]/g, '').toUpperCase().trim();
-    let p = emv('00', '01') + emv('26', emv('00', 'br.gov.bcb.pix') + emv('01', String(chave).trim())) + emv('52', '0000') + emv('53', '986');
+    // Mesmo formato do Pix estático gerado pelos bancos: GUI em maiúsculas e txid "***"
+    // (alguns bancos recusam código estático com txid próprio; o protocolo fica só na planilha)
+    let p = emv('00', '01') + emv('26', emv('00', 'BR.GOV.BCB.PIX') + emv('01', String(chave).replace(/\s/g, ''))) + emv('52', '0000') + emv('53', '986');
     if (valor > 0) p += emv('54', Number(valor).toFixed(2));
     p += emv('58', 'BR') + emv('59', limpa(nome).slice(0, 25) || 'NOIVOS') + emv('60', limpa(cidade).slice(0, 15) || 'NATAL');
-    p += emv('62', emv('05', String(txid || '').replace(/[^A-Za-z0-9]/g, '').slice(0, 25) || '***'));
+    p += emv('62', emv('05', '***'));
     p += '6304';
     return p + crc16(p);
   }
