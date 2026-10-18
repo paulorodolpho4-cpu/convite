@@ -13,9 +13,9 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400;1,500&family=Jost:wght@300;400;500&family=Mrs+Saint+Delafield&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="assets/estilo.css?v=202610181803">
-  <script src="assets/config.js?v=202610181803"></script>
-  <script src="assets/comum.js?v=202610181803"></script>
+  <link rel="stylesheet" href="assets/estilo.css?v=202610181810">
+  <script src="assets/config.js?v=202610181810"></script>
+  <script src="assets/comum.js?v=202610181810"></script>
 </head>
 <body class="travado">
 
@@ -26,6 +26,9 @@
     <p class="rotulo">Você está convidado</p>
     <p class="para" id="para-nome">Com muito carinho</p>
     <p class="rotulo tipo" id="para-tipo">&nbsp;</p>
+    <!-- iPhone: lugar do player do YouTube (o som só é liberado com um toque no próprio player) -->
+    <div class="vaga-player" id="vaga-player" hidden></div>
+    <p class="dica-ios" id="dica-ios" hidden>Toque no ▶ para abrir o convite<br>com a nossa música</p>
     <button class="botao-pilula cheio pulsa" type="button" id="abrir">Abrir convite</button>
     <p class="dica"><span data-icone="musica"></span>Com música · aumente o volume</p>
   </div>
@@ -274,10 +277,25 @@
   if (codigo) carregarConvite(codigo).catch(() => {});
 
   /* ----- Abertura e música de fundo (YouTube) ----- */
-  // Celulares não deixam tocar som antes do primeiro toque: a música já começa (sem som) ao abrir o site
-  // e o som liga no primeiro toque na tela (normalmente o "Abrir convite"). O botão serve para silenciar.
+  // Celulares só tocam som depois de um toque. No Android e no computador, a música começa sem som e o som
+  // liga no primeiro toque (normalmente o "Abrir convite"). No iPhone, o som só é liberado com um toque no
+  // próprio player do YouTube: por isso a abertura mostra o player e o convite abre quando a música começa.
   const botaoMusica = $('musica');
-  let player = null, prontoPlayer = false, querSom = false, silenciadaPeloConvidado = false, jaTeveSom = false;
+  const ios = U.ehIOS();
+  let player = null, prontoPlayer = false, querSom = false, silenciadaPeloConvidado = false, jaTeveSom = false, conviteAberto = false;
+  // Posição do player: 'abertura' (no lugar reservado na tela inicial), 'flutuante' (acima do botão) ou escondido
+  function mostrarPlayer(onde) {
+    if (!prontoPlayer) return;
+    const f = player.getIframe();
+    f.classList.remove('player-abertura', 'player-flutuante');
+    f.removeAttribute('style');
+    if (onde === 'flutuante') f.classList.add('player-flutuante');
+    if (onde === 'abertura') {
+      const r = $('vaga-player').getBoundingClientRect();
+      f.classList.add('player-abertura');
+      Object.assign(f.style, { left: r.left + 'px', top: r.top + 'px', width: r.width + 'px', height: r.height + 'px' });
+    }
+  }
   function iconeMusica() {
     const comSom = prontoPlayer && !player.isMuted() && [YT.PlayerState.PLAYING, YT.PlayerState.BUFFERING].includes(player.getPlayerState());
     botaoMusica.innerHTML = U.icone(comSom ? 'musica' : 'mudo');
@@ -296,10 +314,25 @@
   window.onYouTubeIframeAPIReady = function () {
     player = new YT.Player('player-musica', {
       width: 1, height: 1, videoId: C.musicaYoutube,
-      playerVars: { autoplay: 1, mute: 1, controls: 0, loop: 1, playlist: C.musicaYoutube, playsinline: 1, rel: 0 },
+      playerVars: ios
+        ? { autoplay: 0, controls: 1, loop: 1, playlist: C.musicaYoutube, playsinline: 1, rel: 0, modestbranding: 1 }
+        : { autoplay: 1, mute: 1, controls: 0, loop: 1, playlist: C.musicaYoutube, playsinline: 1, rel: 0 },
       events: {
-        onReady: () => { prontoPlayer = true; player.mute(); player.playVideo(); if (querSom && !silenciadaPeloConvidado) ligarSom(); },
-        onStateChange: iconeMusica
+        onReady: () => {
+          prontoPlayer = true;
+          if (ios) { player.setVolume(100); if (!conviteAberto) mostrarPlayer('abertura'); return; }
+          player.mute(); player.playVideo();
+          if (querSom && !silenciadaPeloConvidado) ligarSom();
+        },
+        onStateChange: (e) => {
+          // iPhone: o convidado tocou no ▶ do player; a música começou com som e o convite abre sozinho
+          if (ios && e.data === YT.PlayerState.PLAYING && !jaTeveSom) {
+            jaTeveSom = true;
+            mostrarPlayer(null);
+            if (!conviteAberto) abrirConvite();
+          }
+          iconeMusica();
+        }
       }
     });
   };
@@ -308,23 +341,42 @@
     s.src = 'https://www.youtube.com/iframe_api';
     document.head.appendChild(s);
     setInterval(() => { if (prontoPlayer) iconeMusica(); }, 1500);
-    // Primeiro toque em qualquer lugar da tela liga o som (se o convidado não silenciou)
-    const primeiroToque = (e) => {
-      if (botaoMusica.contains(e.target) || silenciadaPeloConvidado) return;
-      ['pointerdown', 'touchend', 'click'].forEach((t) => document.removeEventListener(t, primeiroToque, true));
-      ligarSom();
-    };
-    ['pointerdown', 'touchend', 'click'].forEach((t) => document.addEventListener(t, primeiroToque, true));
+    if (ios) {
+      $('vaga-player').hidden = false;
+      $('dica-ios').hidden = false;
+      $('abrir').textContent = 'Abrir sem música';
+      $('abrir').className = 'link-discreto';
+      document.querySelector('.abertura .dica').hidden = true;
+      const reposicionar = () => { if (!conviteAberto && !jaTeveSom) mostrarPlayer('abertura'); };
+      window.addEventListener('resize', reposicionar);
+      window.addEventListener('load', reposicionar);
+      if (document.fonts) document.fonts.ready.then(reposicionar);
+    } else {
+      // Primeiro toque em qualquer lugar da tela liga o som (se o convidado não silenciou)
+      const primeiroToque = (e) => {
+        if (botaoMusica.contains(e.target) || silenciadaPeloConvidado) return;
+        ['pointerdown', 'touchend', 'click'].forEach((t) => document.removeEventListener(t, primeiroToque, true));
+        ligarSom();
+      };
+      ['pointerdown', 'touchend', 'click'].forEach((t) => document.addEventListener(t, primeiroToque, true));
+    }
   }
-  $('abrir').addEventListener('click', () => {
-    if (!silenciadaPeloConvidado) ligarSom();
+  function abrirConvite() {
+    conviteAberto = true;
+    if (ios && !jaTeveSom) mostrarPlayer(null);
     $('abertura').classList.add('aberta');
     document.body.classList.remove('travado');
     if (C.musicaYoutube) { botaoMusica.hidden = false; iconeMusica(); }
     setTimeout(() => { $('abertura').hidden = true; if (location.hash === '#confirmar') abrirRsvp(); }, 1100);
+  }
+  $('abrir').addEventListener('click', () => {
+    if (!ios && !silenciadaPeloConvidado) ligarSom();
+    abrirConvite();
   });
   botaoMusica.addEventListener('click', () => {
     if (!player || !prontoPlayer) return;
+    // iPhone sem música ainda: mostra o player para o convidado tocar no ▶ (o toque de novo esconde)
+    if (ios && !jaTeveSom) { mostrarPlayer(player.getIframe().classList.contains('player-flutuante') ? null : 'flutuante'); return; }
     if (!player.isMuted() && player.getPlayerState() === YT.PlayerState.PLAYING) { silenciadaPeloConvidado = true; player.mute(); }
     else { silenciadaPeloConvidado = false; ligarSom(); }
     setTimeout(iconeMusica, 300);

@@ -386,15 +386,22 @@
   function salvarTempoMusica(player) {
     try { if (player.getPlayerState() === YT.PlayerState.PLAYING) localStorage.setItem('musica-tempo', String(Math.floor(player.getCurrentTime()))); } catch (x) {}
   }
+  // iPhone/iPad (inclusive iPad que se identifica como Mac). "?ios=1" simula, para testes no computador.
+  const ehIOS = () => /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1)
+    || new URLSearchParams(location.search).get('ios') === '1';
+
   function musicaDeFundo() {
     if (!C.musicaYoutube) return;
     const botao = document.createElement('button');
     botao.className = 'musica'; botao.type = 'button';
     const alvo = document.createElement('div');
+    alvo.id = 'player-musica';
     alvo.setAttribute('aria-hidden', 'true');
     document.body.append(botao, alvo);
-    // Começa sem som (único jeito permitido nos celulares) e liga o som no primeiro toque
-    let player = null, pronto = false, querSom = false, silenciada = false;
+    // Começa sem som (único jeito permitido nos celulares) e liga o som no primeiro toque.
+    // No iPhone o som só é liberado tocando no ▶ do player: o botão de música mostra o player.
+    const ios = ehIOS();
+    let player = null, pronto = false, querSom = false, silenciada = false, jaTocouIOS = false;
     const marcar = () => {
       const comSom = pronto && !player.isMuted() && [YT.PlayerState.PLAYING, YT.PlayerState.BUFFERING].includes(player.getPlayerState());
       botao.innerHTML = icone(comSom ? 'musica' : 'mudo');
@@ -413,10 +420,20 @@
       try { inicio = Number(localStorage.getItem('musica-tempo')) || 0; } catch (x) {}
       player = new YT.Player(alvo, {
         width: 1, height: 1, videoId: C.musicaYoutube,
-        playerVars: { autoplay: 1, mute: 1, controls: 0, loop: 1, playlist: C.musicaYoutube, playsinline: 1, rel: 0, start: inicio },
+        playerVars: ios
+          ? { autoplay: 0, controls: 1, loop: 1, playlist: C.musicaYoutube, playsinline: 1, rel: 0, modestbranding: 1, start: inicio }
+          : { autoplay: 1, mute: 1, controls: 0, loop: 1, playlist: C.musicaYoutube, playsinline: 1, rel: 0, start: inicio },
         events: {
-          onReady: () => { pronto = true; player.mute(); player.playVideo(); if (querSom && !silenciada) ligarSom(); },
-          onStateChange: marcar
+          onReady: () => {
+            pronto = true;
+            if (ios) return;
+            player.mute(); player.playVideo();
+            if (querSom && !silenciada) ligarSom();
+          },
+          onStateChange: (e) => {
+            if (ios && e.data === YT.PlayerState.PLAYING && !jaTocouIOS) { jaTocouIOS = true; player.getIframe().classList.remove('player-flutuante'); }
+            marcar();
+          }
         }
       });
       setInterval(() => { if (pronto) { salvarTempoMusica(player); marcar(); } }, 1500);
@@ -424,15 +441,18 @@
     const s = document.createElement('script');
     s.src = 'https://www.youtube.com/iframe_api';
     document.head.appendChild(s);
-    const eventos = ['pointerdown', 'touchend', 'click'];
-    const primeiroToque = (e) => {
-      if (botao.contains(e.target) || silenciada) return;
-      eventos.forEach((t) => document.removeEventListener(t, primeiroToque, true));
-      ligarSom();
-    };
-    eventos.forEach((t) => document.addEventListener(t, primeiroToque, true));
+    if (!ios) {
+      const eventos = ['pointerdown', 'touchend', 'click'];
+      const primeiroToque = (e) => {
+        if (botao.contains(e.target) || silenciada) return;
+        eventos.forEach((t) => document.removeEventListener(t, primeiroToque, true));
+        ligarSom();
+      };
+      eventos.forEach((t) => document.addEventListener(t, primeiroToque, true));
+    }
     botao.addEventListener('click', () => {
       if (!pronto) return;
+      if (ios && !jaTocouIOS) { player.getIframe().classList.toggle('player-flutuante'); return; }
       if (!player.isMuted() && player.getPlayerState() === YT.PlayerState.PLAYING) { silenciada = true; player.mute(); }
       else { silenciada = false; ligarSom(); }
       setTimeout(marcar, 300);
@@ -441,7 +461,7 @@
 
   window.Convite = {
     preencher, animarAoRolar, mascaraCelular, soDigitos, reais, formatarCodigo, primeiroNome,
-    linkConvite, urlDoSite, qrSvg, pixCopiaECola, crc16, icone, api, ligarPaineis, copiar, musicaDeFundo, salvarTempoMusica,
+    linkConvite, urlDoSite, qrSvg, pixCopiaECola, crc16, icone, api, ligarPaineis, copiar, musicaDeFundo, salvarTempoMusica, ehIOS,
     codigoConvite, normalizarCodigoConvite, tipoDoCodigo, iniciarContador, mensagemWhatsApp,
     modoDemo: !C.apiUrl, SENHA_DEMO, CONVITES_EXEMPLO
   };

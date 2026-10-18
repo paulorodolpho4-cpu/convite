@@ -184,7 +184,13 @@ a { color: inherit; }
 .tela-presentes iframe { display: block; width: 100%; height: 100%; border: 0; }
 .musica.tocando .icone { animation: girar 6s linear infinite; }
 @keyframes girar { to { transform: rotate(360deg); } }
-#player-musica { position: fixed; width: 1px; height: 1px; left: -10px; bottom: 0; opacity: 0; pointer-events: none; }
+#player-musica { position: fixed; width: 2px; height: 2px; left: 0; bottom: 0; opacity: .01; pointer-events: none; border: 0; }
+/* iPhone: player do YouTube visível para o convidado tocar no ▶ (só assim o iPhone libera o som) */
+#player-musica.player-abertura { opacity: 1; pointer-events: auto; z-index: 21; border-radius: 14px; box-shadow: 0 10px 30px rgba(59, 36, 22, .25); }
+#player-musica.player-flutuante { left: 50%; bottom: 118px; width: 280px; height: 158px; transform: translateX(-50%); opacity: 1; pointer-events: auto; z-index: 40; border-radius: 14px; box-shadow: 0 10px 30px rgba(59, 36, 22, .3); }
+.abertura .vaga-player { width: 260px; height: 146px; margin: 0 auto 16px; border-radius: 14px; background: var(--bege); }
+.abertura .dica-ios { font-style: italic; font-size: 19px; line-height: 1.35; margin: 0 0 14px; }
+.link-discreto { background: none; border: 0; padding: 8px 12px; font-family: var(--sans); font-size: 10.5px; letter-spacing: .2em; text-transform: uppercase; color: var(--tinta-2); text-decoration: underline; text-underline-offset: 4px; cursor: pointer; }
 
 /* ---------- Botões ---------- */
 .botao, .botao-sec {
