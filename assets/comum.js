@@ -411,7 +411,10 @@
     const ligarSom = () => {
       querSom = true;
       if (!pronto) return;
-      player.unMute(); player.setVolume(70); player.playVideo();
+      player.playVideo();
+      // Se o YouTube estiver passando um anúncio, o som só liga quando a música começar
+      if (player.getPlayerState() !== YT.PlayerState.PLAYING) return;
+      player.unMute(); player.setVolume(70);
       setTimeout(marcar, 400);
     };
     botao.innerHTML = icone('mudo');
@@ -433,6 +436,7 @@
           },
           onStateChange: (e) => {
             if (ios && e.data === YT.PlayerState.PLAYING && !jaTocouIOS) { jaTocouIOS = true; player.getIframe().classList.remove('player-flutuante'); }
+            if (!ios && e.data === YT.PlayerState.PLAYING && querSom && !silenciada && player.isMuted()) ligarSom();
             marcar();
           }
         }

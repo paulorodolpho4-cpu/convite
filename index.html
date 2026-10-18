@@ -13,9 +13,9 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400;1,500&family=Jost:wght@300;400;500&family=Mrs+Saint+Delafield&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="assets/estilo.css?v=202610181814">
-  <script src="assets/config.js?v=202610181814"></script>
-  <script src="assets/comum.js?v=202610181814"></script>
+  <link rel="stylesheet" href="assets/estilo.css?v=202610181817">
+  <script src="assets/config.js?v=202610181817"></script>
+  <script src="assets/comum.js?v=202610181817"></script>
 </head>
 <body class="travado">
 
@@ -305,10 +305,12 @@
   function ligarSom() {
     querSom = true;
     if (!prontoPlayer) return;
+    player.playVideo();
+    // Às vezes o YouTube passa um anúncio antes da música: o som só liga quando a música em si começa
+    if (player.getPlayerState() !== YT.PlayerState.PLAYING) return;
     if (!jaTeveSom) { jaTeveSom = true; player.seekTo(0, true); }
     player.unMute();
     player.setVolume(70);
-    player.playVideo();
     setTimeout(iconeMusica, 400);
   }
   window.onYouTubeIframeAPIReady = function () {
@@ -332,6 +334,8 @@
             mostrarPlayer(null);
             if (!conviteAberto) abrirConvite();
           }
+          // Android/computador: o convidado já tocou na tela e o anúncio (se houve) acabou: liga o som
+          if (!ios && e.data === YT.PlayerState.PLAYING && querSom && !silenciadaPeloConvidado && player.isMuted()) ligarSom();
           iconeMusica();
         }
       }
