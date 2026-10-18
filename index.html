@@ -13,9 +13,9 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400;1,500&family=Jost:wght@300;400;500&family=Mrs+Saint+Delafield&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="assets/estilo.css?v=202610181800">
-  <script src="assets/config.js?v=202610181800"></script>
-  <script src="assets/comum.js?v=202610181800"></script>
+  <link rel="stylesheet" href="assets/estilo.css?v=202610181803">
+  <script src="assets/config.js?v=202610181803"></script>
+  <script src="assets/comum.js?v=202610181803"></script>
 </head>
 <body class="travado">
 
@@ -274,20 +274,32 @@
   if (codigo) carregarConvite(codigo).catch(() => {});
 
   /* ----- Abertura e música de fundo (YouTube) ----- */
+  // Celulares não deixam tocar som antes do primeiro toque: a música já começa (sem som) ao abrir o site
+  // e o som liga no primeiro toque na tela (normalmente o "Abrir convite"). O botão serve para silenciar.
   const botaoMusica = $('musica');
-  let player = null, prontoPlayer = false, querTocar = false;
-  function iconeMusica(tocando) {
-    botaoMusica.innerHTML = U.icone(tocando ? 'musica' : 'mudo');
-    botaoMusica.classList.toggle('tocando', tocando);
-    botaoMusica.setAttribute('aria-label', tocando ? 'Pausar música' : 'Tocar música');
+  let player = null, prontoPlayer = false, querSom = false, silenciadaPeloConvidado = false, jaTeveSom = false;
+  function iconeMusica() {
+    const comSom = prontoPlayer && !player.isMuted() && [YT.PlayerState.PLAYING, YT.PlayerState.BUFFERING].includes(player.getPlayerState());
+    botaoMusica.innerHTML = U.icone(comSom ? 'musica' : 'mudo');
+    botaoMusica.classList.toggle('tocando', comSom);
+    botaoMusica.setAttribute('aria-label', comSom ? 'Silenciar música' : 'Ligar música');
+  }
+  function ligarSom() {
+    querSom = true;
+    if (!prontoPlayer) return;
+    if (!jaTeveSom) { jaTeveSom = true; player.seekTo(0, true); }
+    player.unMute();
+    player.setVolume(70);
+    player.playVideo();
+    setTimeout(iconeMusica, 400);
   }
   window.onYouTubeIframeAPIReady = function () {
     player = new YT.Player('player-musica', {
       width: 1, height: 1, videoId: C.musicaYoutube,
-      playerVars: { autoplay: 0, controls: 0, loop: 1, playlist: C.musicaYoutube, playsinline: 1, rel: 0 },
+      playerVars: { autoplay: 1, mute: 1, controls: 0, loop: 1, playlist: C.musicaYoutube, playsinline: 1, rel: 0 },
       events: {
-        onReady: () => { prontoPlayer = true; player.setVolume(70); if (querTocar) player.playVideo(); },
-        onStateChange: (e) => iconeMusica(e.data === YT.PlayerState.PLAYING || e.data === YT.PlayerState.BUFFERING)
+        onReady: () => { prontoPlayer = true; player.mute(); player.playVideo(); if (querSom && !silenciadaPeloConvidado) ligarSom(); },
+        onStateChange: iconeMusica
       }
     });
   };
@@ -295,18 +307,27 @@
     const s = document.createElement('script');
     s.src = 'https://www.youtube.com/iframe_api';
     document.head.appendChild(s);
+    setInterval(() => { if (prontoPlayer) iconeMusica(); }, 1500);
+    // Primeiro toque em qualquer lugar da tela liga o som (se o convidado não silenciou)
+    const primeiroToque = (e) => {
+      if (botaoMusica.contains(e.target) || silenciadaPeloConvidado) return;
+      ['pointerdown', 'touchend', 'click'].forEach((t) => document.removeEventListener(t, primeiroToque, true));
+      ligarSom();
+    };
+    ['pointerdown', 'touchend', 'click'].forEach((t) => document.addEventListener(t, primeiroToque, true));
   }
   $('abrir').addEventListener('click', () => {
-    querTocar = true;
-    if (prontoPlayer) player.playVideo();
+    if (!silenciadaPeloConvidado) ligarSom();
     $('abertura').classList.add('aberta');
     document.body.classList.remove('travado');
-    if (C.musicaYoutube) { botaoMusica.hidden = false; iconeMusica(prontoPlayer); }
+    if (C.musicaYoutube) { botaoMusica.hidden = false; iconeMusica(); }
     setTimeout(() => { $('abertura').hidden = true; if (location.hash === '#confirmar') abrirRsvp(); }, 1100);
   });
   botaoMusica.addEventListener('click', () => {
     if (!player || !prontoPlayer) return;
-    if (player.getPlayerState() === YT.PlayerState.PLAYING) player.pauseVideo(); else player.playVideo();
+    if (!player.isMuted() && player.getPlayerState() === YT.PlayerState.PLAYING) { silenciadaPeloConvidado = true; player.mute(); }
+    else { silenciadaPeloConvidado = false; ligarSom(); }
+    setTimeout(iconeMusica, 300);
   });
   // Guarda o ponto da música, para a lista de presentes continuar dali se for aberta pelo link direto
   setInterval(() => { if (player && prontoPlayer) U.salvarTempoMusica(player); }, 3000);

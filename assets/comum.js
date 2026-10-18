@@ -393,39 +393,49 @@
     const alvo = document.createElement('div');
     alvo.setAttribute('aria-hidden', 'true');
     document.body.append(botao, alvo);
-    let player = null, pronto = false;
-    const marcar = (tocando) => {
-      botao.innerHTML = icone(tocando ? 'musica' : 'mudo');
-      botao.classList.toggle('tocando', tocando);
-      botao.setAttribute('aria-label', tocando ? 'Pausar música' : 'Tocar música');
+    // Começa sem som (único jeito permitido nos celulares) e liga o som no primeiro toque
+    let player = null, pronto = false, querSom = false, silenciada = false;
+    const marcar = () => {
+      const comSom = pronto && !player.isMuted() && [YT.PlayerState.PLAYING, YT.PlayerState.BUFFERING].includes(player.getPlayerState());
+      botao.innerHTML = icone(comSom ? 'musica' : 'mudo');
+      botao.classList.toggle('tocando', comSom);
+      botao.setAttribute('aria-label', comSom ? 'Silenciar música' : 'Ligar música');
     };
-    marcar(false);
+    const ligarSom = () => {
+      querSom = true;
+      if (!pronto) return;
+      player.unMute(); player.setVolume(70); player.playVideo();
+      setTimeout(marcar, 400);
+    };
+    botao.innerHTML = icone('mudo');
     window.onYouTubeIframeAPIReady = () => {
       let inicio = 0;
       try { inicio = Number(localStorage.getItem('musica-tempo')) || 0; } catch (x) {}
       player = new YT.Player(alvo, {
         width: 1, height: 1, videoId: C.musicaYoutube,
-        playerVars: { autoplay: 1, controls: 0, loop: 1, playlist: C.musicaYoutube, playsinline: 1, rel: 0, start: inicio },
+        playerVars: { autoplay: 1, mute: 1, controls: 0, loop: 1, playlist: C.musicaYoutube, playsinline: 1, rel: 0, start: inicio },
         events: {
-          onReady: () => { pronto = true; player.setVolume(70); player.playVideo(); },
-          onStateChange: (e) => marcar(e.data === YT.PlayerState.PLAYING || e.data === YT.PlayerState.BUFFERING)
+          onReady: () => { pronto = true; player.mute(); player.playVideo(); if (querSom && !silenciada) ligarSom(); },
+          onStateChange: marcar
         }
       });
-      setInterval(() => pronto && salvarTempoMusica(player), 3000);
+      setInterval(() => { if (pronto) { salvarTempoMusica(player); marcar(); } }, 1500);
     };
     const s = document.createElement('script');
     s.src = 'https://www.youtube.com/iframe_api';
     document.head.appendChild(s);
+    const eventos = ['pointerdown', 'touchend', 'click'];
     const primeiroToque = (e) => {
-      if (botao.contains(e.target)) return;
-      document.removeEventListener('click', primeiroToque, true);
-      if (pronto && player.getPlayerState() !== YT.PlayerState.PLAYING) player.playVideo();
+      if (botao.contains(e.target) || silenciada) return;
+      eventos.forEach((t) => document.removeEventListener(t, primeiroToque, true));
+      ligarSom();
     };
-    document.addEventListener('click', primeiroToque, true);
+    eventos.forEach((t) => document.addEventListener(t, primeiroToque, true));
     botao.addEventListener('click', () => {
       if (!pronto) return;
-      document.removeEventListener('click', primeiroToque, true);
-      if (player.getPlayerState() === YT.PlayerState.PLAYING) player.pauseVideo(); else player.playVideo();
+      if (!player.isMuted() && player.getPlayerState() === YT.PlayerState.PLAYING) { silenciada = true; player.mute(); }
+      else { silenciada = false; ligarSom(); }
+      setTimeout(marcar, 300);
     });
   }
 
