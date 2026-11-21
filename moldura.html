@@ -1,0 +1,197 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Moldura · Mylli &amp; Rodolpho</title>
+  <meta name="robots" content="noindex, nofollow">
+  <meta name="theme-color" content="#FAF3ED">
+  <link rel="icon" href="assets/img/monograma.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,300;1,400;1,500&family=Jost:wght@300;400;500&family=Mrs+Saint+Delafield&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/estilo.css?v=202611212020">
+  <script src="assets/config.js?v=202611212020"></script>
+  <script src="assets/comum.js?v=202611212020"></script>
+  <script src="assets/album.js?v=202611212020"></script>
+  <style>
+    .mold { padding: 4px 22px 60px; }
+    .mold .texto { font-size: 20px; line-height: 1.4; text-align: center; margin: 0 4px 20px; }
+    .escolher { position: relative; overflow: hidden; }
+    .escolher input { position: absolute; inset: 0; opacity: 0; cursor: pointer; font-size: 0; }
+    .estilos { display: flex; justify-content: center; gap: 8px; margin: 0 0 16px; }
+    .estilos button { font-family: var(--sans); font-size: 11px; letter-spacing: .22em; text-transform: uppercase; padding: 9px 16px; border-radius: 999px; border: 1px solid var(--tinta); background: transparent; color: var(--tinta); cursor: pointer; }
+    .estilos button[aria-pressed="true"] { background: var(--tinta); color: var(--creme); }
+    .previa { display: block; width: 100%; max-width: 340px; margin: 0 auto; aspect-ratio: 9 / 16; border-radius: 18px; box-shadow: 0 10px 30px rgba(59, 36, 22, .18); background: var(--bege); }
+    .acoes { margin-top: 18px; }
+    .aviso-peq { font-family: var(--sans); font-size: 12px; color: var(--tinta-2); text-align: center; margin-top: 12px; line-height: 1.5; min-height: 1em; }
+    .link-album { display: block; text-align: center; margin-top: 26px; font-family: var(--sans); font-size: 12px; letter-spacing: .2em; text-transform: uppercase; color: var(--tinta); }
+  </style>
+</head>
+<body>
+<main class="pagina">
+  <header class="topo">
+    <img class="monograma" src="assets/img/monograma.png" alt="Monograma M R">
+    <p class="rotulo">Para o seu story</p>
+    <h1 class="titulo-italico">Nossa moldura</h1>
+  </header>
+
+  <section class="mold">
+    <p class="texto">Tire uma foto, ela ganha a moldura do nosso casamento e é só postar no Instagram. Marque a gente!</p>
+
+    <div class="estilos" role="group" aria-label="Estilo da moldura">
+      <button type="button" data-estilo="classica" aria-pressed="true">Clássica</button>
+      <button type="button" data-estilo="papel" aria-pressed="false">Papel</button>
+    </div>
+
+    <canvas class="previa" id="previa" width="1080" height="1920"></canvas>
+
+    <div class="pilha">
+      <label class="botao escolher">
+        <svg class="icone" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.6"/></svg>
+        Tirar foto
+        <input id="camera" type="file" accept="image/*" capture="user">
+      </label>
+      <label class="botao-sec escolher">
+        <svg class="icone" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3.5" y="4.5" width="17" height="15" rx="2"/><path d="m4 17 5-5 4 4 3-3 4 4"/><circle cx="15.5" cy="9" r="1.5"/></svg>
+        Escolher da galeria
+        <input id="galeria" type="file" accept="image/*">
+      </label>
+    </div>
+
+    <div class="pilha acoes" id="acoes" hidden>
+      <button class="botao" id="compartilhar" type="button">Compartilhar no Instagram</button>
+      <button class="botao-sec" id="baixar" type="button">Salvar no celular</button>
+      <button class="botao-sec" id="enviar" type="button">Enviar também para o álbum dos noivos</button>
+    </div>
+    <p class="aviso-peq" id="aviso"></p>
+    <a class="link-album" href="fotos.html">Enviar fotos e vídeos para o álbum →</a>
+  </section>
+</main>
+<script>
+(function () {
+  const C = window.CONVITE;
+  const cv = document.getElementById('previa'), g = cv.getContext('2d');
+  const W = 1080, H = 1920;
+  const aviso = document.getElementById('aviso');
+  let foto = null, estilo = 'classica', blobAtual = null;
+
+  const carregar = (src) => new Promise((ok, erro) => { const i = new Image(); i.onload = () => ok(i); i.onerror = erro; i.src = src; });
+  const monoClaro = carregar('assets/img/monograma-claro.png');
+  const monoEscuro = carregar('assets/img/monograma.png');
+  const fontes = Promise.all([
+    document.fonts.load('120px "Mrs Saint Delafield"'),
+    document.fonts.load('500 30px "Jost"'),
+    document.fonts.load('italic 40px "Cormorant Garamond"')
+  ]).catch(() => {});
+
+  function cobrir(img, x, y, w, h) {
+    const r = Math.max(w / img.width, h / img.height);
+    const sw = w / r, sh = h / r;
+    g.drawImage(img, (img.width - sw) / 2, (img.height - sh) / 2.6, sw, sh, x, y, w, h);
+  }
+
+  function espacado(texto, x, y, esp) {
+    // texto com espaçamento entre letras, centralizado em x
+    const larg = [...texto].reduce((s, c) => s + g.measureText(c).width + esp, -esp);
+    let px = x - larg / 2;
+    g.textAlign = 'left';
+    for (const c of texto) { g.fillText(c, px, y); px += g.measureText(c).width + esp; }
+    g.textAlign = 'center';
+  }
+
+  function cantoArredondado(x, y, w, h, r) {
+    g.beginPath(); g.moveTo(x + r, y); g.arcTo(x + w, y, x + w, y + h, r); g.arcTo(x + w, y + h, x, y + h, r);
+    g.arcTo(x, y + h, x, y, r); g.arcTo(x, y, x + w, y, r); g.closePath();
+  }
+
+  async function desenhar() {
+    await fontes;
+    const nomes = `${C.noivos.ela} & ${C.noivos.ele}`;
+    const data = `${C.dataCurta}  ·  Natal/RN`;
+    g.clearRect(0, 0, W, H);
+    g.textAlign = 'center';
+
+    if (estilo === 'classica') {
+      if (foto) cobrir(foto, 0, 0, W, H); else { g.fillStyle = '#CDBBA8'; g.fillRect(0, 0, W, H); }
+      const grad = g.createLinearGradient(0, H * 0.58, 0, H);
+      grad.addColorStop(0, 'rgba(36, 22, 13, 0)'); grad.addColorStop(1, 'rgba(36, 22, 13, .82)');
+      g.fillStyle = grad; g.fillRect(0, H * 0.58, W, H * 0.42);
+      g.strokeStyle = 'rgba(255, 255, 255, .85)'; g.lineWidth = 3;
+      cantoArredondado(44, 44, W - 88, H - 88, 34); g.stroke();
+      g.drawImage(await monoClaro, W / 2 - 75, H - 520, 150, 150);
+      g.fillStyle = '#FFFFFF';
+      g.font = '150px "Mrs Saint Delafield"'; g.fillText(nomes, W / 2, H - 250);
+      g.font = '500 30px "Jost"'; espacado(data.toUpperCase(), W / 2, H - 150, 9);
+    } else {
+      g.fillStyle = '#F8F3EE'; g.fillRect(0, 0, W, H);
+      const m = 70, fh = 1380;
+      g.save(); cantoArredondado(m, m, W - 2 * m, fh, 26); g.clip();
+      if (foto) cobrir(foto, m, m, W - 2 * m, fh); else { g.fillStyle = '#E3D5C6'; g.fillRect(m, m, W - 2 * m, fh); }
+      g.restore();
+      g.strokeStyle = '#C9BBAE'; g.lineWidth = 2; cantoArredondado(30, 30, W - 60, H - 60, 30); g.stroke();
+      g.drawImage(await monoEscuro, W / 2 - 60, m + fh + 34, 120, 120);
+      g.fillStyle = '#3B2416';
+      g.font = '132px "Mrs Saint Delafield"'; g.fillText(nomes, W / 2, m + fh + 280);
+      g.fillStyle = '#6E4E38'; g.font = '500 28px "Jost"'; espacado(data.toUpperCase(), W / 2, m + fh + 360, 9);
+    }
+    blobAtual = null;
+  }
+
+  function gerarArquivo() {
+    return new Promise((ok) => cv.toBlob((b) => ok(new File([b], 'mylli-e-rodolpho.jpg', { type: 'image/jpeg' })), 'image/jpeg', 0.92));
+  }
+
+  async function escolher(input) {
+    const arq = input.files[0]; input.value = '';
+    if (!arq) return;
+    const url = URL.createObjectURL(arq);
+    try { foto = await carregar(url); }
+    catch (e) { aviso.textContent = 'Não foi possível abrir esta foto. Tente outra.'; return; }
+    await desenhar();
+    document.getElementById('acoes').hidden = false;
+    aviso.textContent = '';
+  }
+
+  document.getElementById('camera').addEventListener('change', (e) => escolher(e.target));
+  document.getElementById('galeria').addEventListener('change', (e) => escolher(e.target));
+
+  document.querySelectorAll('.estilos button').forEach((b) => b.addEventListener('click', () => {
+    estilo = b.dataset.estilo;
+    document.querySelectorAll('.estilos button').forEach((x) => x.setAttribute('aria-pressed', x === b));
+    desenhar();
+  }));
+
+  document.getElementById('compartilhar').addEventListener('click', async () => {
+    const arq = blobAtual || (blobAtual = await gerarArquivo());
+    if (navigator.canShare && navigator.canShare({ files: [arq] })) {
+      try { await navigator.share({ files: [arq] }); } catch (e) { /* cancelado */ }
+    } else {
+      baixar(arq);
+      aviso.textContent = 'A foto foi salva. Abra o Instagram e poste no story a partir da galeria.';
+    }
+  });
+
+  function baixar(arq) {
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(arq); a.download = arq.name; document.body.appendChild(a); a.click(); a.remove();
+  }
+  document.getElementById('baixar').addEventListener('click', async () => {
+    baixar(blobAtual || (blobAtual = await gerarArquivo()));
+    aviso.textContent = 'Foto salva! Se não aparecer, toque e segure a imagem acima para salvar.';
+  });
+
+  document.getElementById('enviar').addEventListener('click', async (e) => {
+    const b = e.currentTarget; b.disabled = true;
+    let autor = ''; try { autor = localStorage.getItem('album-autor') || ''; } catch (err) {}
+    try {
+      await window.Album.enviarArquivo(blobAtual || (blobAtual = await gerarArquivo()), autor, (p) => { b.textContent = 'Enviando… ' + Math.round(p * 100) + '%'; });
+      b.textContent = 'Enviada para o álbum ✓';
+    } catch (err) { b.disabled = false; b.textContent = 'Enviar também para o álbum dos noivos'; aviso.textContent = err.message; }
+  });
+
+  desenhar();
+})();
+</script>
+</body>
+</html>

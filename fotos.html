@@ -1,0 +1,122 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Nosso álbum · Mylli &amp; Rodolpho</title>
+  <meta name="robots" content="noindex, nofollow">
+  <meta name="theme-color" content="#FAF3ED">
+  <link rel="icon" href="assets/img/monograma.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,300;1,400;1,500&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/estilo.css?v=202611212020">
+  <script src="assets/config.js?v=202611212020"></script>
+  <script src="assets/comum.js?v=202611212020"></script>
+  <script src="assets/album.js?v=202611212020"></script>
+  <style>
+    .album { padding: 4px 22px 60px; }
+    .album .texto { font-size: 20px; line-height: 1.4; text-align: center; color: var(--tinta); margin: 0 4px 22px; }
+    .escolher { position: relative; overflow: hidden; }
+    .escolher input { position: absolute; inset: 0; opacity: 0; cursor: pointer; font-size: 0; }
+    .fila { list-style: none; padding: 0; margin: 22px 0 0; display: grid; gap: 10px; }
+    .fila li { background: var(--papel); border: 1px solid var(--bege); border-radius: 16px; padding: 12px 14px; font-family: var(--sans); font-size: 13px; color: var(--tinta-2); }
+    .fila .linha { display: flex; justify-content: space-between; gap: 10px; }
+    .fila .nome { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--tinta); }
+    .fila .barra { height: 5px; background: var(--bege); border-radius: 99px; margin-top: 8px; overflow: hidden; }
+    .fila .barra i { display: block; height: 100%; width: 0; background: var(--tinta); transition: width .2s; }
+    .fila li.ok .barra i { background: var(--verde); }
+    .fila li.falhou { color: var(--vermelho); }
+    .fila li.falhou .barra i { background: var(--vermelho); }
+    .obrigado { text-align: center; margin-top: 22px; font-size: 22px; font-style: italic; }
+    .aviso-peq { font-family: var(--sans); font-size: 12px; color: var(--tinta-2); text-align: center; margin-top: 14px; line-height: 1.5; }
+    .link-moldura { display: block; text-align: center; margin-top: 26px; font-family: var(--sans); font-size: 12px; letter-spacing: .2em; text-transform: uppercase; color: var(--tinta); }
+  </style>
+</head>
+<body>
+<main class="pagina">
+  <header class="topo">
+    <img class="monograma" src="assets/img/monograma.png" alt="Monograma M R">
+    <p class="rotulo">Nosso álbum</p>
+    <h1 class="titulo-italico">Compartilhe o momento</h1>
+  </header>
+
+  <section class="album">
+    <p class="texto">Registrou um momento especial? Envie suas fotos e vídeos para o nosso álbum. Vamos guardar cada um com muito carinho!</p>
+
+    <label class="campo"><span>Seu nome</span><input id="autor" autocomplete="name" placeholder="Para sabermos quem registrou"></label>
+
+    <div class="pilha">
+      <label class="botao escolher">
+        <svg class="icone" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.6"/></svg>
+        Tirar foto ou gravar vídeo
+        <input id="camera" type="file" accept="image/*,video/*" capture="environment">
+      </label>
+      <label class="botao-sec escolher">
+        <svg class="icone" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3.5" y="4.5" width="17" height="15" rx="2"/><path d="m4 17 5-5 4 4 3-3 4 4"/><circle cx="15.5" cy="9" r="1.5"/></svg>
+        Escolher da galeria
+        <input id="galeria" type="file" accept="image/*,video/*" multiple>
+      </label>
+    </div>
+
+    <ul class="fila" id="fila"></ul>
+    <p class="obrigado" id="obrigado" hidden>Recebemos! Muito obrigado por registrar o nosso dia. 🤍</p>
+    <p class="aviso-peq">Pode enviar quantas quiser, em qualidade original.<br>Vídeos grandes demoram mais: mantenha esta página aberta até terminar.</p>
+    <a class="link-moldura" href="moldura.html">Foto com a nossa moldura →</a>
+  </section>
+</main>
+<script>
+(function () {
+  const A = window.Album;
+  const autor = document.getElementById('autor');
+  const fila = document.getElementById('fila');
+  const obrigado = document.getElementById('obrigado');
+  const pendentes = [];
+  let enviando = false;
+
+  try { autor.value = localStorage.getItem('album-autor') || ''; } catch (e) {}
+  autor.addEventListener('change', () => { try { localStorage.setItem('album-autor', autor.value.trim()); } catch (e) {} });
+
+  function adicionar(lista) {
+    [...lista].forEach((arq) => {
+      const li = document.createElement('li');
+      li.innerHTML = '<div class="linha"><span class="nome"></span><span class="estado">Na fila</span></div><div class="barra"><i></i></div>';
+      li.querySelector('.nome').textContent = arq.name || 'arquivo';
+      fila.appendChild(li);
+      pendentes.push({ arq, li });
+    });
+    obrigado.hidden = true;
+    proximo();
+  }
+
+  async function proximo() {
+    if (enviando) return;
+    const item = pendentes.shift();
+    if (!item) { if (fila.querySelector('li.ok')) obrigado.hidden = false; return; }
+    enviando = true;
+    const estado = item.li.querySelector('.estado'), barra = item.li.querySelector('.barra i');
+    const tamanho = A.tamanhoLegivel(item.arq.size);
+    estado.textContent = 'Enviando… 0%';
+    try {
+      await A.enviarArquivo(item.arq, autor.value.trim(), (p) => {
+        barra.style.width = Math.round(p * 100) + '%';
+        estado.textContent = 'Enviando… ' + Math.round(p * 100) + '% de ' + tamanho;
+      });
+      item.li.className = 'ok'; barra.style.width = '100%'; estado.textContent = 'Enviado ✓';
+    } catch (e) {
+      item.li.className = 'falhou'; barra.style.width = '100%'; estado.textContent = e.message || 'Falhou';
+    }
+    enviando = false;
+    proximo();
+  }
+
+  ['camera', 'galeria'].forEach((id) => {
+    const input = document.getElementById(id);
+    input.addEventListener('change', () => { if (input.files.length) adicionar(input.files); input.value = ''; });
+  });
+
+  window.addEventListener('beforeunload', (e) => { if (enviando || pendentes.length) { e.preventDefault(); e.returnValue = ''; } });
+})();
+</script>
+</body>
+</html>
